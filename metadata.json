@@ -1,0 +1,6 @@
+{
+  "name": "Tower Defense",
+  "description": "Action-packed 2D tower defense game with multiple enemy waves, upgradeable towers, and dynamic battles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
