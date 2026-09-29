@@ -243,69 +243,149 @@
     return list;
   }
 
-  // --- 100 PROGRESSIVE CHALLENGES GENERATOR ---
+  // --- 100 PLAYABLE CHALLENGES GENERATOR ---
   function generate100Challenges() {
     const list = [];
-    // 20 Wave Endurance
-    const waveChs = [
-      [2, 100], [4, 150], [6, 200], [8, 250], [10, 350],
-      [12, 450], [14, 550], [16, 700], [18, 850], [20, 1000],
-      [22, 1200], [25, 1500], [28, 1800], [30, 2200], [35, 2700],
-      [40, 3300], [45, 4000], [50, 5000], [65, 6500], [80, 8500]
-    ];
-    waveChs.forEach(([w, r]) => {
-      list.push({ id: `c_surv_${w}`, name: `Survive ${w} Waves`, desc: `Endure across ${w} battle waves`, target: w, current: 0, reward: r, claimed: false, type: 'waves' });
-    });
+    const specs = [
+      // 1 - 10: Introductory Trials
+      { id: 1, title: 'SURVIVE 5 WAVES', desc: 'Survive 5 complete waves.', reward: 100, type: 'waves', target: 5, req: 0 },
+      { id: 2, title: 'SURVIVE 10 WAVES', desc: 'Survive 10 complete waves.', reward: 200, type: 'waves', target: 10, req: 0 },
+      { id: 3, title: 'KILL 50 ENEMIES', desc: 'Eliminate 50 enemy invaders.', reward: 150, type: 'kills', target: 50, req: 0 },
+      { id: 4, title: 'KILL 100 ENEMIES', desc: 'Eliminate 100 enemy invaders.', reward: 250, type: 'kills', target: 100, req: 0 },
+      { id: 5, title: 'DEFEAT 1 BOSS', desc: 'Slay the wave boss.', reward: 300, type: 'boss', target: 1, req: 0 },
+      { id: 6, title: 'DEFEAT 5 BOSSES', desc: 'Slay 5 bosses across waves.', reward: 500, type: 'boss', target: 5, req: 2 },
+      { id: 7, title: 'PERFECT DEFENSE', desc: 'Complete 5 waves without castle health falling below 100.', reward: 400, type: 'perfect', target: 5, req: 3 },
+      { id: 8, title: 'SPEED RUNNER', desc: 'Complete 5 waves within 90 seconds.', reward: 500, type: 'timed', target: 5, timeLimit: 90, req: 4 },
+      { id: 9, title: 'ARCHER MASTER', desc: 'Use Archer Towers to defeat 50 enemies.', reward: 350, type: 'archer_kills', target: 50, req: 5 },
+      { id: 10, title: 'TITAN CRUSHER', desc: 'Defeat a Void Behemoth.', reward: 600, type: 'boss', target: 1, req: 6 },
 
-    // 20 Flawless Defense (full 20 lives)
-    const flawChs = [
-      [1, 120], [2, 180], [3, 250], [4, 320], [5, 420],
-      [6, 520], [7, 650], [8, 800], [9, 950], [10, 1150],
-      [12, 1400], [14, 1700], [16, 2050], [18, 2450], [20, 2900],
-      [25, 3600], [30, 4400], [35, 5300], [40, 6400], [50, 8000]
-    ];
-    flawChs.forEach(([f, r]) => {
-      list.push({ id: `c_flaw_${f}`, name: `Flawless Defense ${f}`, desc: `Complete ${f} waves with castle at 100/100 health`, target: f, current: 0, reward: r, claimed: false, type: 'perfect' });
-    });
+      // 11 - 20: Weapon Specialists & Restraints
+      { id: 11, title: 'CANNON BARRAGE', desc: 'Use Cannon Towers to defeat 50 enemies.', reward: 350, type: 'cannon_kills', target: 50, req: 7 },
+      { id: 12, title: 'FROST DOMAIN', desc: 'Use Magic Towers to defeat 50 enemies.', reward: 350, type: 'magic_kills', target: 50, req: 8 },
+      { id: 13, title: 'STORM CALLER', desc: 'Use Lightning Towers to defeat 50 enemies.', reward: 350, type: 'lightning_kills', target: 50, req: 9 },
+      { id: 14, title: 'ARCHER ONLY 5', desc: 'Survive 5 waves using only Archer Towers.', reward: 400, type: 'archer_only', target: 5, allowedTowers: ['archer'], req: 10 },
+      { id: 15, title: 'CANNON ONLY 5', desc: 'Survive 5 waves using only Cannon Towers.', reward: 450, type: 'cannon_only', target: 5, allowedTowers: ['cannon'], req: 11 },
+      { id: 16, title: 'MAGIC ONLY 5', desc: 'Survive 5 waves using only Magic Towers.', reward: 500, type: 'magic_only', target: 5, allowedTowers: ['magic'], req: 12 },
+      { id: 17, title: 'LIGHTNING ONLY 5', desc: 'Survive 5 waves using only Lightning Towers.', reward: 550, type: 'lightning_only', target: 5, allowedTowers: ['lightning'], req: 13 },
+      { id: 18, title: 'SWARM DEFENSE', desc: 'Eliminate 75 fast scout invaders.', reward: 380, type: 'kills', target: 75, req: 14 },
+      { id: 19, title: 'AIR PATROL', desc: 'Eliminate 60 enemies with fast targeting.', reward: 400, type: 'kills', target: 60, req: 15 },
+      { id: 20, title: 'BUDGET GUARDIAN', desc: 'Survive 5 waves starting with only Rs 250.', reward: 500, type: 'budget', target: 5, startMoney: 250, req: 16 },
 
-    // 20 Carnage Milestones
-    const killChs = [
-      [20, 100], [50, 180], [100, 300], [200, 500], [350, 750],
-      [500, 1000], [750, 1350], [1000, 1750], [1500, 2300], [2000, 2900],
-      [2500, 3600], [3000, 4400], [4000, 5500], [5000, 6800], [6500, 8200],
-      [8000, 9800], [10000, 11800], [12500, 14000], [15000, 17000], [20000, 22000]
-    ];
-    killChs.forEach(([k, r]) => {
-      list.push({ id: `c_kill_${k}`, name: `Carnage: ${k} Kills`, desc: `Destroy ${k} enemy monsters`, target: k, current: 0, reward: r, claimed: false, type: 'kills' });
-    });
+      // 21 - 30: Advanced Endurance
+      { id: 21, title: 'SURVIVE 12 WAVES', desc: 'Survive 12 complete waves.', reward: 450, type: 'waves', target: 12, req: 17 },
+      { id: 22, title: 'KILL 150 ENEMIES', desc: 'Eliminate 150 enemy invaders.', reward: 400, type: 'kills', target: 150, req: 18 },
+      { id: 23, title: 'SPEED RUNNER II', desc: 'Complete 7 waves within 110 seconds.', reward: 550, type: 'timed', target: 7, timeLimit: 110, req: 19 },
+      { id: 24, title: 'PERFECT DEFENSE II', desc: 'Complete 8 waves without castle taking damage.', reward: 600, type: 'perfect', target: 8, req: 20 },
+      { id: 25, title: 'DEFEAT 3 BOSSES', desc: 'Defeat 3 bosses on the battlefield.', reward: 550, type: 'boss', target: 3, req: 21 },
+      { id: 26, title: 'ARCHER SNIPER', desc: 'Kill 80 enemies with Archer Towers.', reward: 450, type: 'archer_kills', target: 80, req: 22 },
+      { id: 27, title: 'ARTILLERY EXPERT', desc: 'Kill 80 enemies with Cannon Towers.', reward: 450, type: 'cannon_kills', target: 80, req: 23 },
+      { id: 28, title: 'GLACIAL CURSE', desc: 'Kill 80 enemies with Magic Towers.', reward: 450, type: 'magic_kills', target: 80, req: 24 },
+      { id: 29, title: 'THUNDERSTORM', desc: 'Kill 80 enemies with Lightning Towers.', reward: 450, type: 'lightning_kills', target: 80, req: 25 },
+      { id: 30, title: 'BUDGET GUARDIAN II', desc: 'Survive 8 waves starting with only Rs 300.', reward: 600, type: 'budget', target: 8, startMoney: 300, req: 26 },
 
-    // 15 Titan Slayers
-    const bossChs = [
-      [1, 300], [2, 500], [3, 750], [4, 1050], [5, 1400],
-      [6, 1800], [7, 2250], [8, 2750], [10, 3400], [12, 4200],
-      [15, 5200], [20, 6500], [25, 8000], [35, 10500], [50, 15000]
-    ];
-    bossChs.forEach(([b, r]) => {
-      list.push({ id: `c_boss_${b}`, name: `Titan Slayer ${b}`, desc: `Slay ${b} wave bosses`, target: b, current: 0, reward: r, claimed: false, type: 'bosses' });
-    });
+      // 31 - 40: Veteran Gauntlet
+      { id: 31, title: 'SURVIVE 15 WAVES', desc: 'Survive 15 complete waves.', reward: 600, type: 'waves', target: 15, req: 27 },
+      { id: 32, title: 'KILL 200 ENEMIES', desc: 'Eliminate 200 enemy invaders.', reward: 500, type: 'kills', target: 200, req: 28 },
+      { id: 33, title: 'ARCHER ONLY 8', desc: 'Survive 8 waves using only Archer Towers.', reward: 650, type: 'archer_only', target: 8, allowedTowers: ['archer'], req: 29 },
+      { id: 34, title: 'CANNON ONLY 8', desc: 'Survive 8 waves using only Cannon Towers.', reward: 700, type: 'cannon_only', target: 8, allowedTowers: ['cannon'], req: 30 },
+      { id: 35, title: 'MAGIC ONLY 8', desc: 'Survive 8 waves using only Magic Towers.', reward: 750, type: 'magic_only', target: 8, allowedTowers: ['magic'], req: 31 },
+      { id: 36, title: 'LIGHTNING ONLY 8', desc: 'Survive 8 waves using only Lightning Towers.', reward: 800, type: 'lightning_only', target: 8, allowedTowers: ['lightning'], req: 32 },
+      { id: 37, title: 'SPEED RUNNER III', desc: 'Complete 10 waves within 150 seconds.', reward: 700, type: 'timed', target: 10, timeLimit: 150, req: 33 },
+      { id: 38, title: 'PERFECT DEFENSE III', desc: 'Complete 10 waves without castle taking damage.', reward: 800, type: 'perfect', target: 10, req: 34 },
+      { id: 39, title: 'DEFEAT 6 BOSSES', desc: 'Slay 6 bosses across the battlefield.', reward: 750, type: 'boss', target: 6, req: 35 },
+      { id: 40, title: 'CARNAGE SPREE', desc: 'Eliminate 250 enemy invaders.', reward: 650, type: 'kills', target: 250, req: 36 },
 
-    // 10 Grand Architect (Level 3 towers)
-    const archChs = [
-      [1, 200], [2, 350], [3, 550], [4, 800], [5, 1100],
-      [6, 1500], [7, 2000], [8, 2600], [10, 3500], [12, 5000]
-    ];
-    archChs.forEach(([a, r]) => {
-      list.push({ id: `c_arch_${a}`, name: `Master Builder ${a}`, desc: `Own ${a} Level 3 towers simultaneously`, target: a, current: 0, reward: r, claimed: false, type: 'max_towers' });
-    });
+      // 41 - 50: Elite Assaults
+      { id: 41, title: 'SURVIVE 18 WAVES', desc: 'Survive 18 complete waves.', reward: 750, type: 'waves', target: 18, req: 37 },
+      { id: 42, title: 'ARCHER ELITE', desc: 'Kill 120 enemies with Archer Towers.', reward: 600, type: 'archer_kills', target: 120, req: 38 },
+      { id: 43, title: 'CANNON BLASTER', desc: 'Kill 120 enemies with Cannon Towers.', reward: 600, type: 'cannon_kills', target: 120, req: 39 },
+      { id: 44, title: 'BLIZZARD MASTER', desc: 'Kill 120 enemies with Magic Towers.', reward: 600, type: 'magic_kills', target: 120, req: 40 },
+      { id: 45, title: 'VOLT COMMANDER', desc: 'Kill 120 enemies with Lightning Towers.', reward: 600, type: 'lightning_kills', target: 120, req: 41 },
+      { id: 46, title: 'BUDGET GUARDIAN III', desc: 'Survive 10 waves starting with only Rs 350.', reward: 800, type: 'budget', target: 10, startMoney: 350, req: 42 },
+      { id: 47, title: 'SPEED RUNNER IV', desc: 'Complete 12 waves within 170 seconds.', reward: 850, type: 'timed', target: 12, timeLimit: 170, req: 43 },
+      { id: 48, title: 'DEFEAT 8 BOSSES', desc: 'Slay 8 wave bosses.', reward: 900, type: 'boss', target: 8, req: 44 },
+      { id: 49, title: 'KILL 300 ENEMIES', desc: 'Eliminate 300 enemy monsters.', reward: 800, type: 'kills', target: 300, req: 45 },
+      { id: 50, title: 'MIDWAY CHAMPION', desc: 'Survive 20 complete waves.', reward: 1000, type: 'waves', target: 20, req: 46 },
 
-    // 15 Speed Rush (Total: 20 + 20 + 20 + 15 + 10 + 15 = 100)
-    const spdChs = [
-      [1, 150], [2, 250], [3, 380], [4, 520], [5, 700],
-      [6, 900], [8, 1200], [10, 1600], [12, 2100], [15, 2700],
-      [20, 3500], [25, 4500], [30, 5800], [40, 7500], [50, 10000]
+      // 51 - 60: Frost & Thunder Trials
+      { id: 51, title: 'PERFECT DEFENSE IV', desc: 'Complete 12 waves without castle taking damage.', reward: 950, type: 'perfect', target: 12, req: 47 },
+      { id: 52, title: 'ARCHER ONLY 10', desc: 'Survive 10 waves using only Archer Towers.', reward: 900, type: 'archer_only', target: 10, allowedTowers: ['archer'], req: 48 },
+      { id: 53, title: 'CANNON ONLY 10', desc: 'Survive 10 waves using only Cannon Towers.', reward: 950, type: 'cannon_only', target: 10, allowedTowers: ['cannon'], req: 49 },
+      { id: 54, title: 'MAGIC ONLY 10', desc: 'Survive 10 waves using only Magic Towers.', reward: 1000, type: 'magic_only', target: 10, allowedTowers: ['magic'], req: 50 },
+      { id: 55, title: 'LIGHTNING ONLY 10', desc: 'Survive 10 waves using only Lightning Towers.', reward: 1050, type: 'lightning_only', target: 10, allowedTowers: ['lightning'], req: 51 },
+      { id: 56, title: 'KILL 350 ENEMIES', desc: 'Eliminate 350 enemy monsters.', reward: 900, type: 'kills', target: 350, req: 52 },
+      { id: 57, title: 'SPEED RUNNER V', desc: 'Complete 15 waves within 200 seconds.', reward: 1000, type: 'timed', target: 15, timeLimit: 200, req: 53 },
+      { id: 58, title: 'DEFEAT 10 BOSSES', desc: 'Slay 10 bosses across waves.', reward: 1100, type: 'boss', target: 10, req: 54 },
+      { id: 59, title: 'ARCHER CHAMPION', desc: 'Kill 150 enemies with Archer Towers.', reward: 850, type: 'archer_kills', target: 150, req: 55 },
+      { id: 60, title: 'SURVIVE 22 WAVES', desc: 'Endure 22 waves of assault.', reward: 1150, type: 'waves', target: 22, req: 56 },
+
+      // 61 - 70: Fortress Siege
+      { id: 61, title: 'CANNON COLOSSUS', desc: 'Kill 150 enemies with Cannon Towers.', reward: 850, type: 'cannon_kills', target: 150, req: 57 },
+      { id: 62, title: 'CRYOMANCER', desc: 'Kill 150 enemies with Magic Towers.', reward: 850, type: 'magic_kills', target: 150, req: 58 },
+      { id: 63, title: 'TEMPEST FURY', desc: 'Kill 150 enemies with Lightning Towers.', reward: 850, type: 'lightning_kills', target: 150, req: 59 },
+      { id: 64, title: 'BUDGET GUARDIAN IV', desc: 'Survive 12 waves starting with only Rs 380.', reward: 1100, type: 'budget', target: 12, startMoney: 380, req: 60 },
+      { id: 65, title: 'PERFECT DEFENSE V', desc: 'Complete 15 waves without castle taking damage.', reward: 1300, type: 'perfect', target: 15, req: 61 },
+      { id: 66, title: 'KILL 400 ENEMIES', desc: 'Eliminate 400 enemy monsters.', reward: 1100, type: 'kills', target: 400, req: 62 },
+      { id: 67, title: 'ARCHER ONLY 12', desc: 'Survive 12 waves using only Archer Towers.', reward: 1200, type: 'archer_only', target: 12, allowedTowers: ['archer'], req: 63 },
+      { id: 68, title: 'CANNON ONLY 12', desc: 'Survive 12 waves using only Cannon Towers.', reward: 1250, type: 'cannon_only', target: 12, allowedTowers: ['cannon'], req: 64 },
+      { id: 69, title: 'MAGIC ONLY 12', desc: 'Survive 12 waves using only Magic Towers.', reward: 1300, type: 'magic_only', target: 12, allowedTowers: ['magic'], req: 65 },
+      { id: 70, title: 'LIGHTNING ONLY 12', desc: 'Survive 12 waves using only Lightning Towers.', reward: 1350, type: 'lightning_only', target: 12, allowedTowers: ['lightning'], req: 66 },
+
+      // 71 - 80: Grand Citadel Defense
+      { id: 71, title: 'SURVIVE 25 WAVES', desc: 'Endure 25 full waves.', reward: 1400, type: 'waves', target: 25, req: 67 },
+      { id: 72, title: 'DEFEAT 12 BOSSES', desc: 'Slay 12 bosses.', reward: 1400, type: 'boss', target: 12, req: 68 },
+      { id: 73, title: 'SPEED RUNNER VI', desc: 'Complete 18 waves within 240 seconds.', reward: 1350, type: 'timed', target: 18, timeLimit: 240, req: 69 },
+      { id: 74, title: 'KILL 450 ENEMIES', desc: 'Eliminate 450 monsters.', reward: 1250, type: 'kills', target: 450, req: 70 },
+      { id: 75, title: 'SHARPSHOOTER LEGEND', desc: 'Kill 200 enemies with Archer Towers.', reward: 1200, type: 'archer_kills', target: 200, req: 71 },
+      { id: 76, title: 'BOMBARDMENT LEGEND', desc: 'Kill 200 enemies with Cannon Towers.', reward: 1200, type: 'cannon_kills', target: 200, req: 72 },
+      { id: 77, title: 'FROSTBITE LEGEND', desc: 'Kill 200 enemies with Magic Towers.', reward: 1200, type: 'magic_kills', target: 200, req: 73 },
+      { id: 78, title: 'THUNDER GOD', desc: 'Kill 200 enemies with Lightning Towers.', reward: 1200, type: 'lightning_kills', target: 200, req: 74 },
+      { id: 79, title: 'BUDGET GUARDIAN V', desc: 'Survive 15 waves starting with only Rs 400.', reward: 1400, type: 'budget', target: 15, startMoney: 400, req: 75 },
+      { id: 80, title: 'SURVIVE 28 WAVES', desc: 'Endure 28 full waves.', reward: 1600, type: 'waves', target: 28, req: 76 },
+
+      // 81 - 90: Champion Crucible
+      { id: 81, title: 'PERFECT DEFENSE VI', desc: 'Complete 18 waves without taking damage.', reward: 1700, type: 'perfect', target: 18, req: 77 },
+      { id: 82, title: 'KILL 500 ENEMIES', desc: 'Eliminate 500 monsters.', reward: 1500, type: 'kills', target: 500, req: 78 },
+      { id: 83, title: 'ARCHER ONLY 15', desc: 'Survive 15 waves using only Archer Towers.', reward: 1600, type: 'archer_only', target: 15, allowedTowers: ['archer'], req: 79 },
+      { id: 84, title: 'CANNON ONLY 15', desc: 'Survive 15 waves using only Cannon Towers.', reward: 1650, type: 'cannon_only', target: 15, allowedTowers: ['cannon'], req: 80 },
+      { id: 85, title: 'MAGIC ONLY 15', desc: 'Survive 15 waves using only Magic Towers.', reward: 1700, type: 'magic_only', target: 15, allowedTowers: ['magic'], req: 81 },
+      { id: 86, title: 'LIGHTNING ONLY 15', desc: 'Survive 15 waves using only Lightning Towers.', reward: 1750, type: 'lightning_only', target: 15, allowedTowers: ['lightning'], req: 82 },
+      { id: 87, title: 'DEFEAT 15 BOSSES', desc: 'Slay 15 wave bosses.', reward: 1800, type: 'boss', target: 15, req: 83 },
+      { id: 88, title: 'SPEED RUNNER VII', desc: 'Complete 20 waves within 260 seconds.', reward: 1700, type: 'timed', target: 20, timeLimit: 260, req: 84 },
+      { id: 89, title: 'SURVIVE 32 WAVES', desc: 'Endure 32 waves.', reward: 1900, type: 'waves', target: 32, req: 85 },
+      { id: 90, title: 'TITAN SLAYER SUPREME', desc: 'Slay 18 wave bosses.', reward: 2000, type: 'boss', target: 18, req: 86 },
+
+      // 91 - 100: Legend Trials
+      { id: 91, title: 'KILL 600 ENEMIES', desc: 'Eliminate 600 enemy invaders.', reward: 2000, type: 'kills', target: 600, req: 87 },
+      { id: 92, title: 'PERFECT DEFENSE VII', desc: 'Complete 20 waves without taking damage.', reward: 2300, type: 'perfect', target: 20, req: 88 },
+      { id: 93, title: 'SURVIVE 35 WAVES', desc: 'Endure 35 waves.', reward: 2200, type: 'waves', target: 35, req: 89 },
+      { id: 94, title: 'ARCHER DEMIGOD', desc: 'Kill 250 enemies with Archer Towers.', reward: 1800, type: 'archer_kills', target: 250, req: 90 },
+      { id: 95, title: 'CANNON DEMIGOD', desc: 'Kill 250 enemies with Cannon Towers.', reward: 1800, type: 'cannon_kills', target: 250, req: 91 },
+      { id: 96, title: 'MAGIC DEMIGOD', desc: 'Kill 250 enemies with Magic Towers.', reward: 1800, type: 'magic_kills', target: 250, req: 92 },
+      { id: 97, title: 'LIGHTNING DEMIGOD', desc: 'Kill 250 enemies with Lightning Towers.', reward: 1800, type: 'lightning_kills', target: 250, req: 93 },
+      { id: 98, title: 'SPEED RUNNER VIII', desc: 'Complete 25 waves within 320 seconds.', reward: 2500, type: 'timed', target: 25, timeLimit: 320, req: 94 },
+      { id: 99, title: 'SURVIVE 40 WAVES', desc: 'Endure 40 waves of relentless siege.', reward: 3000, type: 'waves', target: 40, req: 95 },
+      { id: 100, title: 'REALM GUARDIAN SUPREME', desc: 'Defeat 20 Bosses and survive 50 waves!', reward: 5000, type: 'waves', target: 50, req: 96 }
     ];
-    spdChs.forEach(([s, r]) => {
-      list.push({ id: `c_spd_${s}`, name: `Rapid Cleansing ${s}`, desc: `Clear ${s} fast combat waves`, target: s, current: 0, reward: r, claimed: false, type: 'speed' });
+
+    specs.forEach(s => {
+      list.push({
+        id: s.id,
+        numStr: `Challenge ${s.id < 10 ? '0' + s.id : s.id}`,
+        title: s.title,
+        desc: s.desc,
+        reward: s.reward,
+        type: s.type,
+        target: s.target,
+        timeLimit: s.timeLimit || 0,
+        allowedTowers: s.allowedTowers || null,
+        startMoney: s.startMoney !== undefined ? s.startMoney : 450,
+        reqCompleted: s.req || 0,
+        unlocked: s.id <= 5,
+        completed: false,
+        claimed: false,
+        progress: 0
+      });
     });
 
     return list;
@@ -402,14 +482,32 @@
                 return old ? { ...f, current: old.current, claimed: old.claimed } : f;
               });
             }
-            if (!parsed.challenges || parsed.challenges.length < 100) {
-              const fresh = generate100Challenges();
-              const oldMap = new Map((parsed.challenges || []).map(c => [c.id, c]));
-              parsed.challenges = fresh.map(f => {
-                const old = oldMap.get(f.id);
-                return old ? { ...f, current: old.current, claimed: old.claimed } : f;
+            // Handle 100 Playable Challenges
+            const freshChs = generate100Challenges();
+            let savedChList = [];
+            try {
+              const chRaw = localStorage.getItem('vtd_challenges_data');
+              if (chRaw) savedChList = JSON.parse(chRaw);
+            } catch (e) {}
+            if (!savedChList || savedChList.length === 0) {
+              if (parsed.challenges && Array.isArray(parsed.challenges)) {
+                savedChList = parsed.challenges;
+              }
+            }
+            if (savedChList && savedChList.length > 0) {
+              const chMap = new Map(savedChList.map(c => [c.id, c]));
+              const completedCount = savedChList.filter(c => c.completed).length;
+              freshChs.forEach(c => {
+                const s = chMap.get(c.id);
+                if (s) {
+                  c.completed = !!s.completed;
+                  c.claimed = !!s.claimed;
+                  c.progress = typeof s.progress === 'number' ? s.progress : 0;
+                }
+                c.unlocked = (c.id <= 5) || c.completed || (completedCount >= (c.reqCompleted || 0));
               });
             }
+            parsed.challenges = freshChs;
             if (!parsed.settings) parsed.settings = {};
             if (!parsed.settings.difficulty) {
               parsed.settings.difficulty = localStorage.getItem('vtd_difficulty') || 'easy';
@@ -455,8 +553,21 @@
         localStorage.setItem('vtd_save_data', JSON.stringify(data));
       } catch (e) {}
     },
+    saveChallenges(challenges) {
+      try {
+        const minimal = challenges.map(c => ({
+          id: c.id,
+          completed: !!c.completed,
+          claimed: !!c.claimed,
+          unlocked: !!c.unlocked,
+          progress: c.progress || 0
+        }));
+        localStorage.setItem('vtd_challenges_data', JSON.stringify(minimal));
+      } catch (e) {}
+    },
     resetAll() {
       localStorage.removeItem('vtd_save_data');
+      localStorage.removeItem('vtd_challenges_data');
       localStorage.removeItem('vtd_money');
       localStorage.removeItem('vtd_player_name');
       localStorage.removeItem('vtd_player_avatar');
@@ -474,22 +585,29 @@
   const LOGICAL_WIDTH = 360;
   const LOGICAL_HEIGHT = 640;
 
-  // The long winding path: 13 waypoints covering the vertical screen in switchbacks
+  // Grid Configuration for Long Vertical Battlefield
+  const TILE_SIZE = 40;
+  const GRID_COLS = 9;   // 9 * 40 = 360px (fills width)
+  const GRID_ROWS = 28;  // 28 * 40 = 1120px (long vertical battlefield with scroll)
+  const MAP_WIDTH = GRID_COLS * TILE_SIZE;
+  const MAP_HEIGHT = GRID_ROWS * TILE_SIZE;
+
+  // Long winding dirt/stone enemy path through the grid with many turns and switchbacks
   const PATH_WAYPOINTS = [
-    { x: 180, y: -20 },
-    { x: 180, y: 45 },
-    { x: 300, y: 45 },
-    { x: 300, y: 140 },
-    { x: 60,  y: 140 },
-    { x: 60,  y: 235 },
-    { x: 300, y: 235 },
-    { x: 300, y: 330 },
-    { x: 60,  y: 330 },
-    { x: 60,  y: 425 },
-    { x: 300, y: 425 },
-    { x: 300, y: 515 },
-    { x: 180, y: 515 },
-    { x: 180, y: 600 }
+    { x: 180, y: -20 },   // Top Enemy Spawn (col 4, above row 0)
+    { x: 180, y: 100 },   // Down to (col 4, row 2)
+    { x: 300, y: 100 },   // Right to (col 7, row 2)
+    { x: 300, y: 220 },   // Down to (col 7, row 5)
+    { x: 60,  y: 220 },   // Left switchback across to (col 1, row 5)
+    { x: 60,  y: 380 },   // Down to (col 1, row 9)
+    { x: 300, y: 380 },   // Right switchback across to (col 7, row 9)
+    { x: 300, y: 540 },   // Down to (col 7, row 13)
+    { x: 60,  y: 540 },   // Left switchback across to (col 1, row 13)
+    { x: 60,  y: 700 },   // Down to (col 1, row 17)
+    { x: 300, y: 700 },   // Right switchback across to (col 7, row 17)
+    { x: 300, y: 860 },   // Down to (col 7, row 21)
+    { x: 180, y: 860 },   // Left to (col 4, row 21)
+    { x: 180, y: 1020 }   // Down to Castle Gate (col 4, row 25.5)
   ];
 
   // Pre-calculated segment lengths and total path length
@@ -506,7 +624,7 @@
   }
 
   function getPositionAlongPath(dist) {
-    if (dist <= 0) return { x: PATH_WAYPOINTS[0].x, y: PATH_WAYPOINTS[0].y, angle: 0 };
+    if (dist <= 0) return { x: PATH_WAYPOINTS[0].x, y: PATH_WAYPOINTS[0].y, angle: Math.PI / 2 };
     if (dist >= TOTAL_PATH_LENGTH) {
       const last = PATH_WAYPOINTS[PATH_WAYPOINTS.length - 1];
       return { x: last.x, y: last.y, angle: Math.PI / 2 };
@@ -521,23 +639,60 @@
         return { x, y, angle };
       }
     }
-    return { x: 180, y: 600, angle: 0 };
+    return { x: 180, y: 1020, angle: Math.PI / 2 };
   }
 
-  // Pre-placed strategic stone pedestal slots beside the road
-  const TOWER_SLOTS = [
-    { id: 1,  x: 100, y: 92 },
-    { id: 2,  x: 230, y: 92 },
-    { id: 3,  x: 180, y: 187 },
-    { id: 4,  x: 100, y: 282 },
-    { id: 5,  x: 230, y: 282 },
-    { id: 6,  x: 180, y: 377 },
-    { id: 7,  x: 100, y: 470 },
-    { id: 8,  x: 230, y: 470 },
-    { id: 9,  x: 40,  y: 80 },
-    { id: 10, x: 320, y: 190 },
-    { id: 11, x: 40,  y: 380 },
-    { id: 12, x: 320, y: 470 }
+  // Path detection for grid tiles
+  function isTileOnPath(col, row) {
+    const tileCenterX = col * TILE_SIZE + TILE_SIZE / 2;
+    const tileCenterY = row * TILE_SIZE + TILE_SIZE / 2;
+    for (let seg of PATH_SEGMENTS) {
+      const x1 = seg.p1.x, y1 = seg.p1.y, x2 = seg.p2.x, y2 = seg.p2.y;
+      const dx = x2 - x1, dy = y2 - y1;
+      const lenSq = dx * dx + dy * dy;
+      let t = 0;
+      if (lenSq > 0) {
+        t = Math.max(0, Math.min(1, ((tileCenterX - x1) * dx + (tileCenterY - y1) * dy) / lenSq));
+      }
+      const projX = x1 + t * dx;
+      const projY = y1 + t * dy;
+      const dist = Math.hypot(tileCenterX - projX, tileCenterY - projY);
+      if (dist < TILE_SIZE * 0.55) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Decorative nature elements on select grass tiles (pine trees, rocks, bushes, flowers)
+  const NATURE_DECORATIONS = [
+    { col: 1, row: 1, type: 'trees', count: 4 },
+    { col: 2, row: 1, type: 'trees', count: 4 },
+    { col: 5, row: 1, type: 'bushes' },
+    { col: 6, row: 1, type: 'trees', count: 4 },
+    { col: 2, row: 3, type: 'trees', count: 6 },
+    { col: 3, row: 3, type: 'trees', count: 6 },
+    { col: 4, row: 3, type: 'rocks', count: 3 },
+    { col: 1, row: 7, type: 'bushes' },
+    { col: 3, row: 7, type: 'trees', count: 6 },
+    { col: 4, row: 7, type: 'trees', count: 6 },
+    { col: 5, row: 7, type: 'flowers', count: 4 },
+    { col: 3, row: 11, type: 'rocks', count: 3 },
+    { col: 4, row: 11, type: 'trees', count: 6 },
+    { col: 5, row: 11, type: 'trees', count: 6 },
+    { col: 6, row: 11, type: 'bushes' },
+    { col: 1, row: 15, type: 'bushes' },
+    { col: 2, row: 15, type: 'trees', count: 6 },
+    { col: 3, row: 15, type: 'trees', count: 6 },
+    { col: 4, row: 15, type: 'flowers', count: 4 },
+    { col: 1, row: 19, type: 'bushes' },
+    { col: 3, row: 19, type: 'trees', count: 6 },
+    { col: 4, row: 19, type: 'trees', count: 6 },
+    { col: 5, row: 19, type: 'rocks', count: 3 },
+    { col: 1, row: 23, type: 'trees', count: 6 },
+    { col: 2, row: 23, type: 'trees', count: 6 },
+    { col: 5, row: 23, type: 'bushes' },
+    { col: 6, row: 23, type: 'rocks', count: 3 }
   ];
 
   // Tower Configurations
@@ -661,10 +816,856 @@
     }
   };
 
+  // --- MENU LIVE DEFENSE BATTLE BACKGROUND ---
+  class MenuBattleBackground {
+    constructor() {
+      this.canvas = document.getElementById('menu-battle-canvas');
+      this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+      this.running = false;
+      this.lastTime = 0;
+      this.rafId = null;
+
+      this.scale = 1;
+      this.offsetX = 0;
+      this.offsetY = 0;
+      this.dpr = 1;
+
+      // Long winding stone enemy path
+      this.waypoints = [
+        { x: 180, y: -25 },
+        { x: 180, y: 55 },
+        { x: 65,  y: 110 },
+        { x: 65,  y: 200 },
+        { x: 295, y: 250 },
+        { x: 295, y: 360 },
+        { x: 65,  y: 410 },
+        { x: 65,  y: 490 },
+        { x: 180, y: 540 },
+        { x: 180, y: 640 }
+      ];
+
+      this.segments = [];
+      this.totalPathLength = 0;
+      for (let i = 0; i < this.waypoints.length - 1; i++) {
+        const p1 = this.waypoints[i];
+        const p2 = this.waypoints[i + 1];
+        const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        this.segments.push({ p1, p2, length: len, startDist: this.totalPathLength });
+        this.totalPathLength += len;
+      }
+
+      // Defensive towers placed beside the path actively fighting
+      this.towers = [
+        { type: 'archer', x: 125, y: 80, range: 90, interval: 0.65, cooldown: 0.2, angle: 0, color: '#22c55e', icon: '🏹', name: 'Archer Tower' },
+        { type: 'archer', x: 235, y: 390, range: 90, interval: 0.6, cooldown: 0.4, angle: 0, color: '#22c55e', icon: '🏹', name: 'Archer Tower' },
+        { type: 'cannon', x: 235, y: 175, range: 85, interval: 1.5, cooldown: 0.7, angle: 0, color: '#ef4444', icon: '💣', name: 'Cannon Tower' },
+        { type: 'cannon', x: 125, y: 440, range: 85, interval: 1.4, cooldown: 1.1, angle: 0, color: '#ef4444', icon: '💣', name: 'Cannon Tower' },
+        { type: 'magic', x: 125, y: 230, range: 95, interval: 1.0, cooldown: 0.1, angle: 0, color: '#8b5cf6', icon: '🔮', name: 'Magic Tower' },
+        { type: 'magic', x: 235, y: 515, range: 95, interval: 0.95, cooldown: 0.5, angle: 0, color: '#8b5cf6', icon: '🔮', name: 'Magic Tower' },
+        { type: 'lightning', x: 235, y: 290, range: 105, interval: 1.1, cooldown: 0.3, angle: 0, color: '#f59e0b', icon: '⚡', name: 'Lightning Tower' },
+        { type: 'lightning', x: 125, y: 335, range: 105, interval: 1.15, cooldown: 0.8, angle: 0, color: '#f59e0b', icon: '⚡', name: 'Lightning Tower' }
+      ];
+
+      this.enemies = [];
+      this.projectiles = [];
+      this.particles = [];
+      this.floatingTexts = [];
+      this.lightningArcs = [];
+
+      this.spawnTimer = 0.8;
+      this.castleHitTimer = 0;
+      this.smokeTimer = 0;
+
+      this.seedInitialBattle();
+      this.resize();
+      this.resume();
+    }
+
+    seedInitialBattle() {
+      // Seed 5 staggered enemies across the path for instant active battle
+      const seeds = [
+        { type: 'basic', dist: 70 },
+        { type: 'fast',  dist: 160 },
+        { type: 'heavy', dist: 270 },
+        { type: 'flying', dist: 380 },
+        { type: 'basic', dist: 490 }
+      ];
+      seeds.forEach(s => this.spawnEnemy(s.type, s.dist));
+    }
+
+    spawnEnemy(typeKey, initialDist = -15) {
+      const defs = {
+        basic: { name: 'Goblin Scout', color: '#10b981', icon: '👺', radius: 9, hp: 65, maxHp: 65, speed: 45, flying: false },
+        fast:  { name: 'Shadow Imp', color: '#f97316', icon: '🐺', radius: 8, hp: 45, maxHp: 45, speed: 65, flying: false },
+        heavy: { name: 'Armored Orc', color: '#64748b', icon: '🐗', radius: 12, hp: 170, maxHp: 170, speed: 28, flying: false },
+        flying: { name: 'Winged Harpy', color: '#a855f7', icon: '🦇', radius: 10, hp: 75, maxHp: 75, speed: 52, flying: true }
+      };
+      const def = defs[typeKey] || defs.basic;
+      const pos = this.getPathPosition(initialDist);
+      this.enemies.push({
+        ...def,
+        dist: initialDist,
+        x: pos.x,
+        y: pos.y,
+        angle: pos.angle,
+        slowTimer: 0,
+        slowFactor: 1,
+        hitFlash: 0
+      });
+    }
+
+    getPathPosition(dist) {
+      if (dist <= 0) return { x: this.waypoints[0].x, y: this.waypoints[0].y, angle: Math.PI / 2 };
+      for (let seg of this.segments) {
+        if (dist <= seg.startDist + seg.length) {
+          const segDist = dist - seg.startDist;
+          const ratio = seg.length > 0 ? segDist / seg.length : 0;
+          const x = seg.p1.x + (seg.p2.x - seg.p1.x) * ratio;
+          const y = seg.p1.y + (seg.p2.y - seg.p1.y) * ratio;
+          const angle = Math.atan2(seg.p2.y - seg.p1.y, seg.p2.x - seg.p1.x);
+          return { x, y, angle };
+        }
+      }
+      const last = this.waypoints[this.waypoints.length - 1];
+      return { x: last.x, y: last.y, angle: Math.PI / 2 };
+    }
+
+    resize() {
+      if (!this.canvas) return;
+      const rect = this.canvas.parentElement ? this.canvas.parentElement.getBoundingClientRect() : this.canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.canvas.width = rect.width * dpr;
+      this.canvas.height = rect.height * dpr;
+
+      const scaleX = rect.width / LOGICAL_WIDTH;
+      const scaleY = rect.height / LOGICAL_HEIGHT;
+      this.scale = Math.min(scaleX, scaleY);
+      this.offsetX = (rect.width - LOGICAL_WIDTH * this.scale) / 2;
+      this.offsetY = (rect.height - LOGICAL_HEIGHT * this.scale) / 2;
+      this.dpr = dpr;
+    }
+
+    pause() {
+      this.running = false;
+      if (this.rafId) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+    }
+
+    resume() {
+      if (this.running) return;
+      this.running = true;
+      this.lastTime = performance.now();
+      this.rafId = requestAnimationFrame(ts => this.loop(ts));
+    }
+
+    loop(ts) {
+      if (!this.running) return;
+      const dt = Math.min((ts - this.lastTime) / 1000, 0.1);
+      this.lastTime = ts;
+
+      this.update(dt);
+      this.render();
+
+      this.rafId = requestAnimationFrame(t => this.loop(t));
+    }
+
+    update(dt) {
+      if (this.castleHitTimer > 0) this.castleHitTimer -= dt;
+
+      // Spawn subtle chimney / hearth smoke
+      this.smokeTimer -= dt;
+      if (this.smokeTimer <= 0) {
+        this.smokeTimer = 0.25;
+        this.particles.push({
+          x: 175 + (Math.random() - 0.5) * 20,
+          y: 545,
+          vx: (Math.random() - 0.5) * 8,
+          vy: -18 - Math.random() * 12,
+          color: 'rgba(148, 163, 184, 0.45)',
+          size: 3 + Math.random() * 3,
+          maxLife: 1.2,
+          life: 1.2,
+          alpha: 0.5
+        });
+      }
+
+      // Spawn regular enemies continuously
+      this.spawnTimer -= dt;
+      if (this.spawnTimer <= 0) {
+        const types = ['basic', 'fast', 'heavy', 'flying'];
+        const chosen = types[Math.floor(Math.random() * types.length)];
+        this.spawnEnemy(chosen);
+        this.spawnTimer = 1.7 + Math.random() * 0.9;
+      }
+
+      // Update enemies
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const e = this.enemies[i];
+        if (e.slowTimer > 0) {
+          e.slowTimer -= dt;
+          if (e.slowTimer <= 0) e.slowFactor = 1;
+        }
+        if (e.hitFlash > 0) e.hitFlash -= dt * 6;
+
+        e.dist += e.speed * e.slowFactor * dt;
+        const pos = this.getPathPosition(e.dist);
+        e.x = pos.x;
+        e.y = pos.y;
+        e.angle = pos.angle;
+
+        // Reached castle
+        if (e.dist >= this.totalPathLength - 10) {
+          this.castleHitTimer = 0.45;
+          // Spawn impact dust & sparks
+          for (let k = 0; k < 12; k++) {
+            const ang = Math.random() * Math.PI * 2;
+            const spd = 25 + Math.random() * 50;
+            this.particles.push({
+              x: 180,
+              y: 575,
+              vx: Math.cos(ang) * spd,
+              vy: Math.sin(ang) * spd,
+              color: Math.random() > 0.5 ? '#ef4444' : '#fbbf24',
+              size: 2.5 + Math.random() * 2.5,
+              maxLife: 0.45,
+              life: 0.45,
+              alpha: 1
+            });
+          }
+          this.enemies.splice(i, 1);
+        }
+      }
+
+      // Update Towers combat
+      for (let t of this.towers) {
+        t.cooldown -= dt;
+        // Find nearest valid target
+        let target = null;
+        let minDist = t.range;
+        for (let e of this.enemies) {
+          if (t.type === 'cannon' && e.flying) continue; // Cannon can't hit flying harpies
+          const d = Math.hypot(e.x - t.x, e.y - t.y);
+          if (d <= minDist) {
+            minDist = d;
+            target = e;
+          }
+        }
+
+        if (target) {
+          t.angle = Math.atan2(target.y - t.y, target.x - t.x);
+          if (t.cooldown <= 0) {
+            t.cooldown = t.interval;
+            this.towerShoot(t, target);
+          }
+        }
+      }
+
+      // Update Projectiles
+      for (let i = this.projectiles.length - 1; i >= 0; i--) {
+        const p = this.projectiles[i];
+        p.life -= dt;
+        if (p.life <= 0) {
+          this.projectiles.splice(i, 1);
+          continue;
+        }
+
+        if (p.type === 'arrow' || p.type === 'frostbolt') {
+          // Travel toward target
+          if (p.target && this.enemies.includes(p.target)) {
+            p.targetX = p.target.x;
+            p.targetY = p.target.y;
+          }
+          const dx = p.targetX - p.x;
+          const dy = p.targetY - p.y;
+          const d = Math.hypot(dx, dy);
+          if (d < 12) {
+            this.onProjectileHit(p);
+            this.projectiles.splice(i, 1);
+          } else {
+            const step = p.speed * dt;
+            p.x += (dx / d) * step;
+            p.y += (dy / d) * step;
+            p.angle = Math.atan2(dy, dx);
+            if (p.type === 'frostbolt' && Math.random() > 0.4) {
+              this.particles.push({
+                x: p.x, y: p.y,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                color: '#38bdf8',
+                size: 2,
+                maxLife: 0.25,
+                life: 0.25,
+                alpha: 0.8
+              });
+            }
+          }
+        } else if (p.type === 'cannonball') {
+          p.progress += dt / p.duration;
+          p.x = p.startX + (p.targetX - p.startX) * p.progress;
+          p.y = p.startY + (p.targetY - p.startY) * p.progress - 4 * p.arcHeight * p.progress * (1 - p.progress);
+
+          // Smoke trail
+          if (Math.random() > 0.3) {
+            this.particles.push({
+              x: p.x, y: p.y,
+              vx: (Math.random() - 0.5) * 10,
+              vy: (Math.random() - 0.5) * 10,
+              color: 'rgba(100, 116, 139, 0.6)',
+              size: 2.5,
+              maxLife: 0.3,
+              life: 0.3,
+              alpha: 0.6
+            });
+          }
+
+          if (p.progress >= 1) {
+            this.onProjectileHit(p);
+            this.projectiles.splice(i, 1);
+          }
+        }
+      }
+
+      // Update Particles
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const pt = this.particles[i];
+        pt.life -= dt;
+        if (pt.life <= 0) {
+          this.particles.splice(i, 1);
+          continue;
+        }
+        pt.x += pt.vx * dt;
+        pt.y += pt.vy * dt;
+        pt.alpha = pt.life / pt.maxLife;
+      }
+
+      // Update Lightning Arcs
+      for (let i = this.lightningArcs.length - 1; i >= 0; i--) {
+        this.lightningArcs[i].life -= dt;
+        if (this.lightningArcs[i].life <= 0) {
+          this.lightningArcs.splice(i, 1);
+        }
+      }
+
+      // Update Floating Texts
+      for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = this.floatingTexts[i];
+        ft.life -= dt;
+        if (ft.life <= 0) {
+          this.floatingTexts.splice(i, 1);
+          continue;
+        }
+        ft.y += ft.vy * dt;
+        ft.alpha = ft.life / ft.maxLife;
+      }
+    }
+
+    towerShoot(tower, target) {
+      if (tower.type === 'archer') {
+        this.projectiles.push({
+          type: 'arrow',
+          x: tower.x,
+          y: tower.y,
+          target,
+          targetX: target.x,
+          targetY: target.y,
+          angle: tower.angle,
+          speed: 320,
+          damage: 18,
+          life: 1.2
+        });
+      } else if (tower.type === 'cannon') {
+        this.projectiles.push({
+          type: 'cannonball',
+          startX: tower.x,
+          startY: tower.y,
+          x: tower.x,
+          y: tower.y,
+          targetX: target.x,
+          targetY: target.y,
+          progress: 0,
+          duration: 0.6,
+          arcHeight: 35,
+          splashRadius: 42,
+          damage: 48,
+          life: 1.5
+        });
+      } else if (tower.type === 'magic') {
+        this.projectiles.push({
+          type: 'frostbolt',
+          x: tower.x,
+          y: tower.y,
+          target,
+          targetX: target.x,
+          targetY: target.y,
+          speed: 240,
+          damage: 22,
+          slowDuration: 2.2,
+          slowFactor: 0.55,
+          life: 1.2
+        });
+      } else if (tower.type === 'lightning') {
+        // Chain lightning jump between up to 3 enemies
+        const chained = [target];
+        let curr = target;
+        for (let step = 1; step < 3; step++) {
+          let nearest = null;
+          let minD = 90;
+          for (let e of this.enemies) {
+            if (!chained.includes(e)) {
+              const d = Math.hypot(e.x - curr.x, e.y - curr.y);
+              if (d < minD) {
+                minD = d;
+                nearest = e;
+              }
+            }
+          }
+          if (nearest) {
+            chained.push(nearest);
+            curr = nearest;
+          } else break;
+        }
+
+        let prev = { x: tower.x, y: tower.y };
+        chained.forEach((e, idx) => {
+          this.lightningArcs.push({
+            x1: prev.x, y1: prev.y,
+            x2: e.x, y2: e.y,
+            life: 0.16
+          });
+          prev = { x: e.x, y: e.y };
+          const dmg = Math.round(36 * (1 - idx * 0.22));
+          this.damageEnemy(e, dmg);
+        });
+      }
+    }
+
+    onProjectileHit(proj) {
+      if (proj.type === 'cannonball') {
+        this.spawnExplosion(proj.targetX, proj.targetY, '#ef4444', 16);
+        for (let e of this.enemies) {
+          if (!e.flying) {
+            const d = Math.hypot(e.x - proj.targetX, e.y - proj.targetY);
+            if (d <= proj.splashRadius) {
+              const falloff = 1 - (d / proj.splashRadius) * 0.45;
+              this.damageEnemy(e, Math.round(proj.damage * falloff));
+            }
+          }
+        }
+      } else if (proj.type === 'arrow') {
+        this.spawnExplosion(proj.x, proj.y, '#22c55e', 5);
+        if (proj.target && this.enemies.includes(proj.target)) {
+          this.damageEnemy(proj.target, proj.damage);
+        }
+      } else if (proj.type === 'frostbolt') {
+        this.spawnExplosion(proj.x, proj.y, '#38bdf8', 8);
+        if (proj.target && this.enemies.includes(proj.target)) {
+          proj.target.slowTimer = proj.slowDuration;
+          proj.target.slowFactor = proj.slowFactor;
+          this.damageEnemy(proj.target, proj.damage);
+        }
+      }
+    }
+
+    damageEnemy(enemy, dmg) {
+      enemy.hp -= dmg;
+      enemy.hitFlash = 1;
+      this.floatingTexts.push({
+        x: enemy.x + (Math.random() - 0.5) * 8,
+        y: enemy.y - 10,
+        text: `-${dmg}`,
+        color: '#f8fafc',
+        vy: -25,
+        maxLife: 0.5,
+        life: 0.5,
+        alpha: 1
+      });
+
+      if (enemy.hp <= 0) {
+        const idx = this.enemies.indexOf(enemy);
+        if (idx !== -1) {
+          this.enemies.splice(idx, 1);
+          this.spawnExplosion(enemy.x, enemy.y, enemy.color, 14);
+        }
+      }
+    }
+
+    spawnExplosion(x, y, color, count) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 20 + Math.random() * 75;
+        this.particles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          color,
+          size: 2 + Math.random() * 3,
+          maxLife: 0.35 + Math.random() * 0.25,
+          life: 0.35 + Math.random() * 0.25,
+          alpha: 1
+        });
+      }
+    }
+
+    render() {
+      if (!this.ctx) return;
+      const ctx = this.ctx;
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      ctx.save();
+      ctx.scale(this.dpr, this.dpr);
+      ctx.translate(this.offsetX, this.offsetY);
+      ctx.scale(this.scale, this.scale);
+
+      // Subtle cinematic camera drift
+      const t = performance.now();
+      const camX = Math.sin(t * 0.00035) * 3.5;
+      const camY = Math.cos(t * 0.00028) * 3.0;
+      const camZoom = 1.0 + Math.sin(t * 0.0002) * 0.012;
+
+      ctx.translate(LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2);
+      ctx.scale(camZoom, camZoom);
+      ctx.translate(-LOGICAL_WIDTH / 2 + camX, -LOGICAL_HEIGHT / 2 + camY);
+
+      // 1. Terrain Grass Background
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+
+      // Subtle terrain grid texture
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= LOGICAL_WIDTH; x += 30) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, LOGICAL_HEIGHT); ctx.stroke();
+      }
+      for (let y = 0; y <= LOGICAL_HEIGHT; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(LOGICAL_WIDTH, y); ctx.stroke();
+      }
+
+      // 2. Winding Stone Enemy Path
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 26;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(this.waypoints[0].x, this.waypoints[0].y);
+      for (let i = 1; i < this.waypoints.length; i++) {
+        ctx.lineTo(this.waypoints[i].x, this.waypoints[i].y);
+      }
+      ctx.stroke();
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 20;
+      ctx.stroke();
+
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 8]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 3. Enemy Entrance Arch
+      const ent = this.waypoints[1];
+      ctx.save();
+      ctx.translate(ent.x, ent.y - 20);
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🚪 ENTRANCE', 0, 0);
+      ctx.restore();
+
+      // 4. Defensive Towers
+      for (let tw of this.towers) {
+        ctx.save();
+        ctx.translate(tw.x, tw.y);
+
+        // Stone Base
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = tw.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Tower Body
+        ctx.fillStyle = tw.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, 13, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tower Icon
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tw.icon, 0, -1);
+
+        // Special Tower Effects
+        if (tw.type === 'lightning') {
+          ctx.strokeStyle = 'rgba(254, 240, 138, 0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          const spkR = 15 + Math.sin(t * 0.008) * 2;
+          ctx.arc(0, 0, spkR, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (tw.type === 'magic') {
+          const orbAng = t * 0.004;
+          const ox = Math.cos(orbAng) * 15;
+          const oy = Math.sin(orbAng) * 15;
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(ox, oy, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      // 5. Lightning Arcs
+      for (let arc of this.lightningArcs) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.35)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(arc.x1, arc.y1);
+        ctx.lineTo(arc.x2, arc.y2);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(arc.x1, arc.y1);
+        const midX = (arc.x1 + arc.x2) / 2 + (Math.random() - 0.5) * 16;
+        const midY = (arc.y1 + arc.y2) / 2 + (Math.random() - 0.5) * 16;
+        ctx.lineTo(midX, midY);
+        ctx.lineTo(arc.x2, arc.y2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 6. Enemies
+      for (let e of this.enemies) {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+
+        // Flying shadow
+        if (e.flying) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+          ctx.beginPath();
+          ctx.ellipse(0, 10, e.radius, e.radius * 0.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.translate(0, -6);
+        }
+
+        // Enemy Body
+        ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : e.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#020617';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Icon
+        ctx.font = `${e.radius * 1.2}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(e.icon, 0, 0);
+
+        // Frost tint overlay if slowed
+        if (e.slowTimer > 0) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.radius + 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#bae6fd';
+          for (let s = 0; s < 4; s++) {
+            const sAng = (t * 0.004) + s * (Math.PI / 2);
+            ctx.fillRect(Math.cos(sAng) * (e.radius + 3) - 1, Math.sin(sAng) * (e.radius + 3) - 1, 2, 2);
+          }
+        }
+
+        // Health Bar
+        const barW = Math.max(18, e.radius * 2);
+        const barH = 3;
+        const barY = -e.radius - 5;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(-barW / 2, barY, barW, barH);
+        const hpPct = Math.max(0, e.hp / e.maxHp);
+        ctx.fillStyle = hpPct > 0.4 ? '#10b981' : '#ef4444';
+        ctx.fillRect(-barW / 2, barY, barW * hpPct, barH);
+
+        ctx.restore();
+      }
+
+      // 7. Projectiles
+      for (let p of this.projectiles) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        if (p.type === 'arrow') {
+          ctx.rotate(p.angle);
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-6, 0);
+          ctx.lineTo(6, 0);
+          ctx.stroke();
+          // Arrow tip
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.moveTo(6, 0);
+          ctx.lineTo(2, -3);
+          ctx.lineTo(2, 3);
+          ctx.closePath();
+          ctx.fill();
+        } else if (p.type === 'cannonball') {
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(0, 0, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath();
+          ctx.arc(-1, -1, 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.type === 'frostbolt') {
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(0, 0, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(0, 0, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 8. Fantasy Castle at bottom
+      const cX = 180;
+      const cY = 575;
+      ctx.save();
+      ctx.translate(cX, cY);
+
+      // Castle Hit pulse ring
+      if (this.castleHitTimer > 0) {
+        const pulseR = 28 + (1 - this.castleHitTimer / 0.45) * 24;
+        ctx.strokeStyle = `rgba(239, 68, 68, ${this.castleHitTimer / 0.45})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Castle Stone Keep
+      ctx.fillStyle = this.castleHitTimer > 0 ? '#450a0a' : '#1e293b';
+      ctx.fillRect(-45, -20, 90, 40);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-45, -20, 90, 40);
+
+      // Crenellations
+      ctx.fillStyle = '#334155';
+      for (let cx = -45; cx <= 35; cx += 16) {
+        ctx.fillRect(cx, -28, 10, 8);
+      }
+
+      // Central Arched Gate
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.arc(0, 10, 14, Math.PI, 0);
+      ctx.rect(-14, 10, 28, 10);
+      ctx.fill();
+
+      // Glowing Warm Windows
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(-28, -8, 8, 12);
+      ctx.fillRect(20, -8, 8, 12);
+
+      // Turrets on Left & Right
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-52, -32, 14, 48);
+      ctx.fillRect(38, -32, 14, 48);
+      ctx.strokeRect(-52, -32, 14, 48);
+      ctx.strokeRect(38, -32, 14, 48);
+
+      // Animated Torches on Turrets
+      const flameFlicker = Math.sin(t * 0.015) * 2;
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(-45, -36, 4 + flameFlicker * 0.5, 0, Math.PI * 2);
+      ctx.arc(45, -36, 4 - flameFlicker * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(-45, -36, 2, 0, Math.PI * 2);
+      ctx.arc(45, -36, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Animated Waving Flags
+      const flagWave = Math.sin(t * 0.006) * 4;
+      // Left flag
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-45, -32); ctx.lineTo(-45, -50); ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(-45, -50);
+      ctx.quadraticCurveTo(-33 + flagWave, -45, -25, -44 + flagWave);
+      ctx.lineTo(-45, -38);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right flag
+      ctx.beginPath();
+      ctx.moveTo(45, -32); ctx.lineTo(45, -50); ctx.stroke();
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.moveTo(45, -50);
+      ctx.quadraticCurveTo(57 + flagWave, -45, 65, -44 + flagWave);
+      ctx.lineTo(45, -38);
+      ctx.closePath();
+      ctx.fill();
+
+      // Castle Icon Emblem
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏰', 0, -4);
+
+      ctx.restore();
+
+      // 9. Particles
+      for (let pt of this.particles) {
+        ctx.save();
+        ctx.globalAlpha = pt.alpha;
+        ctx.fillStyle = pt.color;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 10. Floating Texts
+      for (let ft of this.floatingTexts) {
+        ctx.save();
+        ctx.globalAlpha = ft.alpha;
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = ft.color;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+  }
+
   // --- STATE OF CURRENT GAMEPLAY ---
   class GameState {
     constructor() {
       this.sound = new SoundManager();
+      this.menuBattle = new MenuBattleBackground();
       this.saveData = Storage.load();
       this.money = typeof this.saveData.money === 'number' ? this.saveData.money : 0;
       this.playerName = this.saveData.playerName || "Your Player";
@@ -717,10 +1718,28 @@
       this.spawnInterval = 0.8;
       this.spawnTimer = 0;
 
-      // Selection
-      this.selectedSlot = null;
+      // Selection & Grid
+      this.selectedTile = null;
       this.selectedTower = null;
       this.selectedBuildType = null;
+      this.hoverTile = null;
+
+      // Playable Challenge Tracking (100 Challenges)
+      this.activeChallenge = null;
+      this.isChallengeMode = false;
+      this.challengeKills = 0;
+      this.challengeWavesCompleted = 0;
+      this.challengeBossKills = 0;
+      this.challengeTowerKills = { archer: 0, cannon: 0, magic: 0, lightning: 0 };
+      this.challengeCastleDamaged = false;
+      this.challengeStartTime = 0;
+      this.challengeTimeElapsed = 0;
+      this.challengeTimeLimit = 0;
+
+      // Camera Scrolling for Long Vertical Battlefield
+      this.cameraY = 0;
+      this.targetCameraY = 0;
+      this.maxCameraY = Math.max(0, MAP_HEIGHT - (LOGICAL_HEIGHT - 120));
 
       // Canvas & Rendering
       this.canvas = document.getElementById('game-canvas');
@@ -949,10 +1968,24 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const sc = document.getElementById(id);
       if (sc) sc.classList.add('active');
+
+      if (this.menuBattle) {
+        if (id === 'main-menu') {
+          this.menuBattle.resume();
+        } else {
+          this.menuBattle.pause();
+        }
+      }
     }
 
     startMatch() {
       this.sound.init();
+      this.isChallengeMode = false;
+      this.activeChallenge = null;
+      document.getElementById('active-challenge-hud')?.classList.add('hidden');
+      document.getElementById('challenge-complete-modal')?.classList.add('hidden');
+      document.getElementById('challenge-failed-modal')?.classList.add('hidden');
+
       this.isPlaying = true;
       this.castleHealth = 100;
       this.maxCastleHealth = 100;
@@ -974,9 +2007,13 @@
       this.floatingTexts = [];
       this.lightningArcs = [];
 
-      this.selectedSlot = null;
+      this.selectedTile = null;
       this.selectedTower = null;
       this.selectedBuildType = null;
+      this.hoverTile = null;
+      this.cameraY = 0;
+      this.targetCameraY = 0;
+      document.getElementById('tile-selection-hint')?.classList.add('hidden');
       document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
       this.closeInspector();
 
@@ -987,6 +2024,10 @@
     }
 
     endMatchGameOver() {
+      if (this.isChallengeMode) {
+        this.failChallenge();
+        return;
+      }
       this.isPlaying = false;
       this.sound.stopMusic();
       this.sound.gameOverSound();
@@ -1004,6 +2045,10 @@
     }
 
     showVictoryScreen() {
+      if (this.isChallengeMode) {
+        this.completeChallenge();
+        return;
+      }
       this.isPlaying = false;
       this.sound.stopMusic();
       this.sound.victorySound();
@@ -1037,7 +2082,18 @@
       const wb = document.getElementById('wave-control-bar');
 
       if (hc) hc.textContent = `${this.castleHealth} / ${this.maxCastleHealth}`;
-      if (hw) hw.textContent = `WAVE ${this.wave} / 100`;
+      if (hw) {
+        if (this.isChallengeMode && this.activeChallenge) {
+          const ch = this.activeChallenge;
+          if (['waves', 'perfect', 'timed', 'archer_only', 'cannon_only', 'magic_only', 'lightning_only', 'budget'].includes(ch.type)) {
+            hw.textContent = `WAVE ${this.wave} / ${ch.target}`;
+          } else {
+            hw.textContent = `WAVE ${this.wave}`;
+          }
+        } else {
+          hw.textContent = `WAVE ${this.wave} / 100`;
+        }
+      }
       this.updateMoneyDisplay();
 
       if (wb) {
@@ -1045,6 +2101,9 @@
       }
       if (pt) {
         pt.textContent = `${Math.max(0, Math.ceil(this.prepTimer))}s`;
+      }
+      if (this.isChallengeMode) {
+        this.updateChallengeProgressUI();
       }
     }
 
@@ -1139,6 +2198,12 @@
       this.syncStats();
       this.saveAll();
 
+      if (this.isChallengeMode && this.activeChallenge) {
+        this.challengeWavesCompleted++;
+        this.checkChallengeConditions();
+        if (!this.isPlaying) return;
+      }
+
       if (this.wave >= 100) {
         // Successfully completed Wave 100: Show victory!
         this.sound.victorySound();
@@ -1159,24 +2224,28 @@
     // --- CANVAS SIZING & COORDINATES ---
     resizeCanvas() {
       const wrapper = document.querySelector('.game-wrapper');
-      if (!this.canvas) return;
+      if (this.canvas) {
+        const width = (wrapper && wrapper.clientWidth) ? wrapper.clientWidth : 360;
+        const height = (wrapper && wrapper.clientHeight) ? wrapper.clientHeight : 640;
+        const dpr = window.devicePixelRatio || 1;
 
-      const width = (wrapper && wrapper.clientWidth) ? wrapper.clientWidth : 360;
-      const height = (wrapper && wrapper.clientHeight) ? wrapper.clientHeight : 640;
-      const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = width * dpr;
+        this.canvas.height = height * dpr;
 
-      this.canvas.width = width * dpr;
-      this.canvas.height = height * dpr;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
 
-      this.canvas.style.width = width + 'px';
-      this.canvas.style.height = height + 'px';
+        // Fit 360x640 logical coordinates inside canvas aspect ratio
+        const scaleX = width / LOGICAL_WIDTH;
+        const scaleY = height / LOGICAL_HEIGHT;
+        this.scale = Math.min(scaleX, scaleY);
+        this.offsetX = (width - LOGICAL_WIDTH * this.scale) / 2;
+        this.offsetY = (height - LOGICAL_HEIGHT * this.scale) / 2;
+      }
 
-      // Fit 360x640 logical coordinates inside canvas aspect ratio
-      const scaleX = width / LOGICAL_WIDTH;
-      const scaleY = height / LOGICAL_HEIGHT;
-      this.scale = Math.min(scaleX, scaleY);
-      this.offsetX = (width - LOGICAL_WIDTH * this.scale) / 2;
-      this.offsetY = (height - LOGICAL_HEIGHT * this.scale) / 2;
+      if (this.menuBattle) {
+        this.menuBattle.resize();
+      }
     }
 
     async enterFullscreen() {
@@ -1227,6 +2296,9 @@
       if (this.castleHitTimer > 0) {
         this.castleHitTimer -= dt;
       }
+
+      // Smooth camera interpolation
+      this.cameraY += (this.targetCameraY - this.cameraY) * 0.16;
 
       // Wave prep countdown
       if (!this.isWaveActive) {
@@ -1609,35 +2681,129 @@
       });
     }
 
-    // --- TOWER MANAGEMENT ---
-    selectSlot(slot) {
-      this.selectedSlot = slot;
-      const existing = this.towers.find(t => t.slotId === slot.id);
-      if (existing) {
-        this.openInspector(existing);
-      } else {
-        this.closeInspector();
-        if (this.selectedBuildType) {
-          this.buildTowerOnSlot(slot, this.selectedBuildType);
+    // --- FREE TOWER PLACEMENT & GRID INTERACTION ---
+    isTileValidForPlacement(col, row) {
+      if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return false;
+      if (row >= 25) return false; // Castle ramparts & fortress
+      if (row === 0 && col === 4) return false; // Enemy spawn portal
+      if (isTileOnPath(col, row)) return false; // Enemy path
+      if (this.towers.some(t => t.col === col && t.row === row)) return false; // Already occupied
+      return true;
+    }
+
+    clearTileSelection() {
+      this.selectedTile = null;
+      document.getElementById('tile-selection-hint')?.classList.add('hidden');
+      document.getElementById('tile-tower-modal')?.classList.add('hidden');
+    }
+
+    openTowerSelectModal(col, row) {
+      this.selectedTile = { col, row };
+      const modal = document.getElementById('tile-tower-modal');
+      const coord = document.getElementById('tile-select-coord');
+      if (coord) coord.textContent = `Selected Block (Row ${row + 1}, Col ${col + 1})`;
+
+      // Update affordability on the tower options
+      document.querySelectorAll('.tower-select-option').forEach(btn => {
+        const type = btn.getAttribute('data-build');
+        const cfg = TOWER_CONFIGS[type];
+        if (cfg) {
+          if (this.money < cfg.cost) {
+            btn.classList.add('cant-afford');
+          } else {
+            btn.classList.remove('cant-afford');
+          }
         }
+      });
+
+      if (modal) modal.classList.remove('hidden');
+
+      const hint = document.getElementById('tile-selection-hint');
+      const text = document.getElementById('tile-selection-text');
+      if (hint && text) {
+        text.textContent = `Block [R${row + 1}, C${col + 1}] selected`;
+        hint.classList.remove('hidden');
       }
     }
 
-    buildTowerOnSlot(slot, typeKey) {
+    closeTowerSelectModal() {
+      document.getElementById('tile-tower-modal')?.classList.add('hidden');
+      this.clearTileSelection();
+    }
+
+    handleTileClick(col, row) {
+      if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) {
+        this.closeInspector();
+        this.clearTileSelection();
+        return;
+      }
+
+      // 1. Check if clicked an existing tower on this tile
+      const existing = this.towers.find(t => t.col === col && t.row === row);
+      if (existing) {
+        this.clearTileSelection();
+        this.sound.buttonClick();
+        this.openInspector(existing);
+        return;
+      }
+
+      // 2. Check if clicked castle or spawn
+      if (row >= 25 || (row === 0 && col === 4)) {
+        this.closeInspector();
+        this.clearTileSelection();
+        this.sound.buttonClick();
+        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'CASTLE AREA!', '#ef4444');
+        return;
+      }
+
+      // 3. Check if clicked enemy path
+      if (isTileOnPath(col, row)) {
+        this.closeInspector();
+        this.clearTileSelection();
+        this.sound.buttonClick();
+        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'CANNOT BUILD ON PATH!', '#ef4444');
+        return;
+      }
+
+      // 4. Clicked an available green grass tile!
+      this.closeInspector();
+      this.sound.buttonClick();
+
+      // If a tower card was already selected in the bottom bar, build it immediately!
+      if (this.selectedBuildType) {
+        this.buildTowerOnTile(col, row, this.selectedBuildType);
+        return;
+      }
+
+      // Otherwise highlight selected tile and open the tower selection UI!
+      this.openTowerSelectModal(col, row);
+    }
+
+    buildTowerOnTile(col, row, typeKey) {
+      if (!this.isTileValidForPlacement(col, row)) {
+        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'INVALID LOCATION!', '#ef4444');
+        return;
+      }
+
       const cfg = TOWER_CONFIGS[typeKey];
       if (!cfg) return;
 
       if (!this.spendMoney(cfg.cost)) {
         this.sound.buttonClick();
-        this.addFloatingText(slot.x, slot.y - 15, 'NOT ENOUGH MONEY!', '#ef4444');
+        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, `NEED Rs ${cfg.cost}!`, '#ef4444');
         return;
       }
 
       this.sound.upgradeSound();
+      const x = col * TILE_SIZE + TILE_SIZE / 2;
+      const y = row * TILE_SIZE + TILE_SIZE / 2;
+
       const tower = {
-        slotId: slot.id,
-        x: slot.x,
-        y: slot.y,
+        id: Date.now() + Math.random(),
+        col,
+        row,
+        x,
+        y,
         type: typeKey,
         name: cfg.name,
         icon: cfg.icon,
@@ -1662,6 +2828,24 @@
       this.syncStats();
       this.saveAll();
 
+      // Build particles & dust
+      for (let i = 0; i < 14; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 15 + Math.random() * 45;
+        this.particles.push({
+          x, y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          color: cfg.color,
+          size: 2.5 + Math.random() * 2.5,
+          maxLife: 0.45,
+          life: 0.45,
+          alpha: 1
+        });
+      }
+      this.addFloatingText(x, y - 20, `BUILT! -Rs ${cfg.cost}`, '#fbbf24');
+
+      this.clearTileSelection();
       this.openInspector(tower);
     }
 
@@ -1749,131 +2933,363 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      // Apply responsive center scaling
+      // Center & scale responsive logical viewport (360x640)
       ctx.scale(dpr, dpr);
       ctx.translate(this.offsetX, this.offsetY);
       ctx.scale(this.scale, this.scale);
 
       const gfx = this.getGraphicsConfig();
+      const now = performance.now();
 
-      // 1. Background Grass / Stone Terrain
-      ctx.fillStyle = '#111827';
-      ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
-
-      // Terrain grid texture (skip on LOW for best performance)
-      if (gfx.detailedAnimations) {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x <= LOGICAL_WIDTH; x += 30) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, LOGICAL_HEIGHT); ctx.stroke();
-        }
-        for (let y = 0; y <= LOGICAL_HEIGHT; y += 30) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(LOGICAL_WIDTH, y); ctx.stroke();
-        }
-      }
-
-      // 2. Winding Path (Stone Border + Dirt Track)
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 26;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(PATH_WAYPOINTS[0].x, PATH_WAYPOINTS[0].y);
-      for (let i = 1; i < PATH_WAYPOINTS.length; i++) {
-        ctx.lineTo(PATH_WAYPOINTS[i].x, PATH_WAYPOINTS[i].y);
-      }
-      ctx.stroke();
-
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 20;
-      ctx.stroke();
-
-      if (gfx.detailedAnimations) {
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([8, 8]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // 3. Castle / Base at the end
-      const lastWp = PATH_WAYPOINTS[PATH_WAYPOINTS.length - 1];
+      // Viewport clip so battle content stays within logical canvas bounds
       ctx.save();
-      ctx.translate(lastWp.x, lastWp.y);
+      ctx.beginPath();
+      ctx.rect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+      ctx.clip();
 
-      // Castle damage pulse shockwave if hit recently
+      // Camera Scrolling Translation
+      ctx.save();
+      ctx.translate(0, -Math.round(this.cameraY));
+
+      // 1. Tiled Grid-Based Grass & Path Battlefield
+      for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+          const tileX = c * TILE_SIZE;
+          const tileY = r * TILE_SIZE;
+
+          if (r >= 26) {
+            // Castle Stone Courtyard
+            ctx.fillStyle = (c + r) % 2 === 0 ? '#1e293b' : '#172033';
+            ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+          } else if (isTileOnPath(c, r)) {
+            // Dirt / Stone Path Tile
+            ctx.fillStyle = '#dfb064';
+            ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+
+            // Path cobblestones / pebbles
+            if (gfx.detailedAnimations) {
+              ctx.fillStyle = '#caa054';
+              const pSeed = (c * 17 + r * 31) % 10;
+              ctx.beginPath();
+              ctx.arc(tileX + 12 + (pSeed % 16), tileY + 14 + (pSeed * 2 % 14), 2.5, 0, Math.PI * 2);
+              ctx.arc(tileX + 26 - (pSeed % 10), tileY + 28 - (pSeed * 3 % 12), 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            // Path borders
+            ctx.strokeStyle = '#c29143';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+          } else {
+            // Vibrant Green Grass Tile (with subtle checkerboard shading like reference)
+            ctx.fillStyle = (c + r) % 2 === 0 ? '#4da428' : '#459922';
+            ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+
+            // Subtle grass border
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.06)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+
+            // Top-left light edge for crisp tile depth
+            if (gfx.detailedAnimations) {
+              ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+              ctx.beginPath();
+              ctx.moveTo(tileX, tileY + TILE_SIZE);
+              ctx.lineTo(tileX, tileY);
+              ctx.lineTo(tileX + TILE_SIZE, tileY);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      // 2. Decorative Nature Elements (Pine trees, rocks, flowers like reference)
+      for (let dec of NATURE_DECORATIONS) {
+        // Skip drawing nature if a tower is built on this tile
+        if (this.towers.some(t => t.col === dec.col && t.row === dec.row)) continue;
+        const dx = dec.col * TILE_SIZE + 20;
+        const dy = dec.row * TILE_SIZE + 20;
+
+        if (dec.type === 'trees') {
+          // Pine tree clump (conical layered trees with drop shadow)
+          const offsets = [
+            [-8, -8], [8, -8],
+            [-8, 6],  [8, 6]
+          ];
+          for (let i = 0; i < Math.min(dec.count, offsets.length); i++) {
+            const tx = dx + offsets[i][0];
+            const ty = dy + offsets[i][1];
+
+            // Tree Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(tx, ty + 5, 6, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Trunk
+            ctx.fillStyle = '#5c3a1e';
+            ctx.fillRect(tx - 1, ty + 2, 2, 4);
+
+            // Layered Conical Foliage
+            ctx.fillStyle = '#2d6a1b';
+            ctx.beginPath();
+            ctx.arc(tx, ty + 1, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#3a8723';
+            ctx.beginPath();
+            ctx.arc(tx, ty - 3, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#52b728';
+            ctx.beginPath();
+            ctx.arc(tx, ty - 6, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (dec.type === 'rocks') {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.beginPath();
+          ctx.ellipse(dx, dy + 4, 8, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#64748b';
+          ctx.beginPath();
+          ctx.arc(dx - 3, dy, 5, 0, Math.PI * 2);
+          ctx.arc(dx + 4, dy + 1, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#94a3b8';
+          ctx.beginPath();
+          ctx.arc(dx - 4, dy - 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (dec.type === 'bushes') {
+          // Lush rounded bush clump
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+          ctx.beginPath();
+          ctx.ellipse(dx, dy + 5, 9, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#226017';
+          ctx.beginPath();
+          ctx.arc(dx - 5, dy + 1, 6, 0, Math.PI * 2);
+          ctx.arc(dx + 5, dy + 1, 6, 0, Math.PI * 2);
+          ctx.arc(dx, dy - 2, 7.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#3eb321';
+          ctx.beginPath();
+          ctx.arc(dx - 2, dy - 3, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (dec.type === 'flowers') {
+          const fColors = ['#f43f5e', '#fbbf24', '#ffffff', '#38bdf8'];
+          for (let f = 0; f < 4; f++) {
+            ctx.fillStyle = fColors[f];
+            ctx.beginPath();
+            ctx.arc(dx + (f % 2 === 0 ? -6 : 6), dy + (f < 2 ? -6 : 6), 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // 3. Enemy Spawn Portal at Top (row 0, col 4)
+      ctx.save();
+      ctx.translate(180, 20);
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      const portalAura = (now * 0.005) % (Math.PI * 2);
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
+      ctx.beginPath();
+      ctx.arc(0, 0, 12, portalAura, portalAura + Math.PI);
+      ctx.stroke();
+
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🚪', 0, 0);
+
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillStyle = '#fca5a5';
+      ctx.fillText('SPAWN', 0, 24);
+      ctx.restore();
+
+      // 4. Fantasy Castle at Bottom (rows 25 to 27)
+      const castleGateY = 25 * TILE_SIZE + 20; // 1020px
+      ctx.save();
+      ctx.translate(180, castleGateY);
+
+      // Castle Hit pulse shockwave
       if (this.castleHitTimer > 0) {
-        const pulseR = 26 + (1 - this.castleHitTimer / 0.5) * 25;
+        const pulseR = 30 + (1 - this.castleHitTimer / 0.5) * 35;
         ctx.strokeStyle = `rgba(239, 68, 68, ${this.castleHitTimer / 0.5})`;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
         ctx.stroke();
+      }
 
-        if (gfx.detailedAnimations) {
-          ctx.strokeStyle = `rgba(251, 191, 36, ${(this.castleHitTimer / 0.5) * 0.7})`;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(0, 0, pulseR * 0.7, 0, Math.PI * 2);
-          ctx.stroke();
+      // Stone Wall with Crenellations across row 26
+      ctx.fillStyle = this.castleHitTimer > 0 ? '#450a0a' : '#1e293b';
+      ctx.fillRect(-180, 20, 360, 50);
+      ctx.strokeStyle = this.castleHitTimer > 0 ? '#ef4444' : '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-180, 20, 360, 50);
+
+      // Battlements / Crenellations
+      ctx.fillStyle = '#334155';
+      for (let bx = -180; bx < 180; bx += 20) {
+        ctx.fillRect(bx, 10, 12, 10);
+      }
+
+      // Central Arched Fortress Gateway
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.arc(0, 30, 20, Math.PI, 0);
+      ctx.rect(-20, 30, 40, 25);
+      ctx.fill();
+
+      // Portcullis iron bars
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 2;
+      for (let ix = -14; ix <= 14; ix += 7) {
+        ctx.beginPath(); ctx.moveTo(ix, 15); ctx.lineTo(ix, 55); ctx.stroke();
+      }
+
+      // Torches on Left & Right
+      const flameP = Math.sin(now * 0.015) * 2;
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(-35, 18, 4 + flameP * 0.5, 0, Math.PI * 2);
+      ctx.arc(35, 18, 4 - flameP * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(-35, 18, 2, 0, Math.PI * 2);
+      ctx.arc(35, 18, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Animated Flags on Towers
+      const fWave = Math.sin(now * 0.006) * 4;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-140, 10); ctx.lineTo(-140, -10); ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(-140, -10);
+      ctx.quadraticCurveTo(-128 + fWave, -6, -120, -5 + fWave);
+      ctx.lineTo(-140, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath(); ctx.moveTo(140, 10); ctx.lineTo(140, -10); ctx.stroke();
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.moveTo(140, -10);
+      ctx.quadraticCurveTo(152 + fWave, -6, 160, -5 + fWave);
+      ctx.lineTo(140, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Castle Health Bar & Label
+      const cBarW = 100;
+      const cBarH = 6;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.fillRect(-cBarW / 2, -20, cBarW, cBarH);
+      const cHpPct = Math.max(0, this.castleHealth / this.maxCastleHealth);
+      ctx.fillStyle = cHpPct > 0.5 ? '#10b981' : (cHpPct > 0.25 ? '#f59e0b' : '#ef4444');
+      ctx.fillRect(-cBarW / 2, -20, cBarW * cHpPct, cBarH);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-cBarW / 2, -20, cBarW, cBarH);
+
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(`🏰 CASTLE DEFENSE (${this.castleHealth} HP)`, 0, -28);
+      ctx.restore();
+
+      // 5. Grid Hover & Selection Highlights
+      // A) Hover preview
+      if (this.hoverTile) {
+        const hc = this.hoverTile.col;
+        const hr = this.hoverTile.row;
+        const hx = hc * TILE_SIZE;
+        const hy = hr * TILE_SIZE;
+        const occupied = this.towers.find(t => t.col === hc && t.row === hr);
+
+        if (occupied) {
+          // Occupied tile: subtle blue/gold inspect highlight
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(hx + 1, hy + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+          ctx.fillRect(hx, hy, TILE_SIZE, TILE_SIZE);
+        } else if (this.isTileValidForPlacement(hc, hr)) {
+          // Available placement tile: green highlight + placement preview
+          ctx.fillStyle = 'rgba(34, 197, 94, 0.25)';
+          ctx.fillRect(hx, hy, TILE_SIZE, TILE_SIZE);
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(hx + 1, hy + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+
+          // Tower placement preview & range
+          const previewType = this.selectedBuildType || 'archer';
+          const cfg = TOWER_CONFIGS[previewType];
+          if (cfg) {
+            ctx.save();
+            ctx.strokeStyle = this.selectedBuildType ? 'rgba(34, 197, 94, 0.65)' : 'rgba(255, 255, 255, 0.35)';
+            ctx.fillStyle = this.selectedBuildType ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(hx + 20, hy + 20, cfg.baseRange, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = '18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.globalAlpha = this.selectedBuildType ? 0.9 : 0.55;
+            ctx.fillText(this.selectedBuildType ? cfg.icon : '➕', hx + 20, hy + 20);
+            ctx.restore();
+          }
+        } else if (isTileOnPath(hc, hr) || hr >= 25 || (hr === 0 && hc === 4)) {
+          // Path or Castle tile: red preview indicating no placement allowed
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
+          ctx.fillRect(hx, hy, TILE_SIZE, TILE_SIZE);
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(hx + 1, hy + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('🚫', hx + 20, hy + 20);
         }
       }
 
-      ctx.fillStyle = this.castleHitTimer > 0 ? '#450a0a' : '#0f172a';
-      ctx.beginPath();
-      ctx.arc(0, 0, 26, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = this.castleHitTimer > 0 ? '#ef4444' : '#f59e0b';
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      // B) Currently selected tile (awaiting tower build)
+      if (this.selectedTile) {
+        const sc = this.selectedTile.col;
+        const sr = this.selectedTile.row;
+        const sx = sc * TILE_SIZE;
+        const sy = sr * TILE_SIZE;
 
-      // Castle Health Bar below castle
-      const cBarW = 44;
-      const cBarH = 4;
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(-cBarW / 2, 30, cBarW, cBarH);
-      const cHpPct = Math.max(0, this.castleHealth / this.maxCastleHealth);
-      ctx.fillStyle = cHpPct > 0.5 ? '#10b981' : (cHpPct > 0.25 ? '#f59e0b' : '#ef4444');
-      ctx.fillRect(-cBarW / 2, 30, cBarW * cHpPct, cBarH);
+        const pulse = Math.sin(now * 0.008) * 3;
+        ctx.fillStyle = 'rgba(251, 191, 36, 0.3)';
+        ctx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(sx + 1, sy + 1, TILE_SIZE - 2, TILE_SIZE - 2);
 
-      ctx.font = '22px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('🏰', 0, 0);
-      ctx.restore();
-
-      // 4. Enemy Entrance at top
-      const firstWp = PATH_WAYPOINTS[1];
-      ctx.save();
-      ctx.translate(firstWp.x, firstWp.y - 20);
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('🚪 ENTRANCE', 0, 0);
-      ctx.restore();
-
-      // 5. Tower Slots / Pedestals
-      for (let slot of TOWER_SLOTS) {
-        const placed = this.towers.find(t => t.slotId === slot.id);
-        ctx.save();
-        ctx.translate(slot.x, slot.y);
-
-        // Stone Base
-        ctx.fillStyle = placed ? '#1e293b' : 'rgba(30, 41, 59, 0.6)';
-        ctx.beginPath();
-        ctx.arc(0, 0, 16, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = placed ? '#f59e0b' : 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = placed ? 2 : 1;
-        ctx.stroke();
-
-        if (!placed) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-          ctx.font = '12px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('+', 0, 0);
-        }
-        ctx.restore();
+        // Glowing corners
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(sx - pulse * 0.3, sy - pulse * 0.3, TILE_SIZE + pulse * 0.6, TILE_SIZE + pulse * 0.6);
       }
 
       // 6. Placed Towers
@@ -1881,181 +3297,182 @@
         ctx.save();
         ctx.translate(t.x, t.y);
 
-        // Enhanced tower effects on HIGH
-        if (gfx.enhancedTowerEffects) {
-          if (t.cooldown <= 0) {
-            ctx.strokeStyle = t.color;
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.arc(0, 0, 16 + Math.sin(Date.now() / 180) * 1.5, 0, Math.PI * 2);
-            ctx.stroke();
-          }
-          if (t.level >= 3) {
-            ctx.fillStyle = 'rgba(251, 191, 36, 0.2)';
-            ctx.beginPath();
-            ctx.arc(0, 0, 18, 0, Math.PI * 2);
-            ctx.fill();
-          }
+        // Range circle if selected
+        if (this.selectedTower === t) {
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
+          ctx.fillStyle = 'rgba(245, 158, 11, 0.1)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, t.range, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Selection bracket
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(-18, -18, 36, 36);
         }
+
+        // Stone Base Pedestal
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = t.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
         // Tower Body
         ctx.fillStyle = t.color;
         ctx.beginPath();
-        ctx.arc(0, 0, 13, 0, Math.PI * 2);
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.font = '14px sans-serif';
+        // Rotating Weaponry / Turret
+        ctx.save();
+        ctx.rotate(t.angle);
+        if (t.type === 'archer') {
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, 9, -Math.PI / 3, Math.PI / 3);
+          ctx.stroke();
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-4, 0); ctx.lineTo(10, 0); ctx.stroke();
+        } else if (t.type === 'cannon') {
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, -3.5, 14, 7);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(10, -4, 3, 8);
+        } else if (t.type === 'magic') {
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.moveTo(12, 0); ctx.lineTo(0, -5); ctx.lineTo(-4, 0); ctx.lineTo(0, 5); ctx.closePath();
+          ctx.fill();
+        } else if (t.type === 'lightning') {
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(0, -2, 12, 4);
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(12, 0, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Tower Icon
+        ctx.font = '13px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(t.icon, 0, -1);
 
-        // Level Stars
-        ctx.fillStyle = '#fef08a';
-        ctx.font = '8px sans-serif';
-        let stars = '★'.repeat(t.level);
-        ctx.fillText(stars, 0, 11);
-
-        ctx.restore();
-      }
-
-      // 7. Tower Range Overlay for Selected Tower
-      if (this.selectedTower) {
-        ctx.save();
-        ctx.translate(this.selectedTower.x, this.selectedTower.y);
-        ctx.beginPath();
-        ctx.arc(0, 0, this.selectedTower.range, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.12)';
-        ctx.fill();
-        ctx.strokeStyle = '#f59e0b';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // 8. Lightning Arcs
-      for (let arc of this.lightningArcs) {
-        ctx.save();
-        if (gfx.detailedAnimations) {
-          ctx.strokeStyle = 'rgba(254, 240, 138, 0.35)';
-          ctx.lineWidth = 5;
-          ctx.beginPath();
-          ctx.moveTo(arc.x1, arc.y1);
-          ctx.lineTo(arc.x2, arc.y2);
-          ctx.stroke();
+        // Level Stars Badge
+        if (t.level > 1) {
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillStyle = '#fef08a';
+          ctx.fillText('★'.repeat(t.level), 0, 15);
         }
 
+        ctx.restore();
+      }
+
+      // 7. Lightning Arcs
+      for (let arc of this.lightningArcs) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
+        ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(arc.x1, arc.y1); ctx.lineTo(arc.x2, arc.y2); ctx.stroke();
         ctx.strokeStyle = '#fef08a';
         ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(arc.x1, arc.y1);
+        ctx.beginPath(); ctx.moveTo(arc.x1, arc.y1);
         const midX = (arc.x1 + arc.x2) / 2 + (Math.random() - 0.5) * 16;
         const midY = (arc.y1 + arc.y2) / 2 + (Math.random() - 0.5) * 16;
-        ctx.lineTo(midX, midY);
-        ctx.lineTo(arc.x2, arc.y2);
+        ctx.lineTo(midX, midY); ctx.lineTo(arc.x2, arc.y2);
         ctx.stroke();
         ctx.restore();
       }
 
-      // 9. Enemies
+      // 8. Enemies
       for (let e of this.enemies) {
         ctx.save();
         ctx.translate(e.x, e.y);
-
-        // Enhanced Boss Corona & Stomp Shockwave
-        if (e.isBoss && gfx.enhancedBossEffects) {
-          const bossGrad = ctx.createRadialGradient(0, 0, e.radius * 0.4, 0, 0, e.radius * 2.3);
-          bossGrad.addColorStop(0, 'rgba(168, 85, 247, 0.5)');
-          bossGrad.addColorStop(0.6, 'rgba(239, 68, 68, 0.22)');
-          bossGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-          ctx.fillStyle = bossGrad;
-          ctx.beginPath();
-          ctx.arc(0, 0, e.radius * 2.3, 0, Math.PI * 2);
-          ctx.fill();
-
-          const shockPhase = (Date.now() % 1600) / 1600;
-          ctx.strokeStyle = `rgba(239, 68, 68, ${1 - shockPhase})`;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(0, 0, e.radius + shockPhase * 24, 0, Math.PI * 2);
-          ctx.stroke();
-        }
 
         // Flying shadow
         if (e.flying) {
           ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
           ctx.beginPath();
-          ctx.ellipse(0, 10, e.radius, e.radius * 0.5, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, 12, e.radius, e.radius * 0.5, 0, 0, Math.PI * 2);
           ctx.fill();
-          ctx.translate(0, -6); // lift up
+          ctx.translate(0, -8);
         }
 
         // Enemy Body
-        ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : e.color;
+        ctx.fillStyle = e.hitFlashTimer > 0 ? '#ffffff' : e.color;
         ctx.beginPath();
         ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#020617';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = e.isBoss ? '#f59e0b' : '#020617';
+        ctx.lineWidth = e.isBoss ? 2.5 : 1.5;
         ctx.stroke();
 
-        // Icon
-        ctx.font = `${e.radius * 1.2}px sans-serif`;
+        // Monster Icon
+        ctx.font = `${Math.round(e.radius * 1.2)}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(e.icon, 0, 0);
 
-        // Frost tint overlay if slowed
+        // Frost Slow Aura
         if (e.slowTimer > 0) {
           ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
           ctx.beginPath();
-          ctx.arc(0, 0, e.radius + 2, 0, Math.PI * 2);
+          ctx.arc(0, 0, e.radius + 3, 0, Math.PI * 2);
           ctx.fill();
-
-          if (gfx.enhancedEnemyEffects) {
-            ctx.fillStyle = '#bae6fd';
-            for (let s = 0; s < 4; s++) {
-              const sAng = (Date.now() / 250) + s * (Math.PI / 2);
-              ctx.fillRect(Math.cos(sAng) * (e.radius + 4) - 1.5, Math.sin(sAng) * (e.radius + 4) - 1.5, 3, 3);
-            }
+          ctx.fillStyle = '#bae6fd';
+          for (let s = 0; s < 4; s++) {
+            const sAng = (now * 0.005) + s * (Math.PI / 2);
+            ctx.fillRect(Math.cos(sAng) * (e.radius + 4) - 1, Math.sin(sAng) * (e.radius + 4) - 1, 2, 2);
           }
         }
 
         // Health Bar
-        const barW = Math.max(20, e.radius * 2);
-        const barH = 3;
+        const barW = Math.max(20, e.radius * 2 + 4);
+        const barH = e.isBoss ? 5 : 3.5;
         const barY = -e.radius - 6;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(-barW / 2, barY, barW, barH);
         const hpPct = Math.max(0, e.hp / e.maxHp);
         ctx.fillStyle = hpPct > 0.4 ? '#10b981' : '#ef4444';
         ctx.fillRect(-barW / 2, barY, barW * hpPct, barH);
-
         ctx.restore();
       }
 
-      // 10. Projectiles
+      // 9. Projectiles
       for (let p of this.projectiles) {
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.fillStyle = p.color;
-        if (p.type === 'archer') {
-          ctx.beginPath();
-          ctx.arc(0, 0, 3, 0, Math.PI * 2);
-          ctx.fill();
+        if (p.type === 'arrow') {
+          ctx.rotate(p.angle);
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(2, -3); ctx.lineTo(2, 3); ctx.closePath(); ctx.fill();
         } else if (p.type === 'cannon') {
-          ctx.beginPath();
-          ctx.arc(0, 0, 5, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath(); ctx.arc(-1, -1, 2, 0, Math.PI * 2); ctx.fill();
         } else if (p.type === 'magic') {
-          ctx.beginPath();
-          ctx.arc(0, 0, 4, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
         }
         ctx.restore();
       }
 
-      // 11. Particles
+      // 10. Particles
       for (let pt of this.particles) {
         ctx.save();
         ctx.globalAlpha = pt.alpha;
@@ -2066,18 +3483,37 @@
         ctx.restore();
       }
 
-      // 12. Floating Texts
+      // 11. Floating Texts
       for (let ft of this.floatingTexts) {
         ctx.save();
         ctx.globalAlpha = ft.alpha;
-        ctx.font = 'bold 11px sans-serif';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = ft.color;
         ctx.fillText(ft.text, ft.x, ft.y);
         ctx.restore();
       }
 
-      ctx.restore();
+      ctx.restore(); // Restore Camera Translation
+
+      // 12. Minimap / Scroll Bar Indicator on Right Screen Edge
+      const trackH = 140;
+      const trackW = 4;
+      const trackX = LOGICAL_WIDTH - 8;
+      const trackY = (LOGICAL_HEIGHT - trackH) / 2;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.fillRect(trackX, trackY, trackW, trackH);
+
+      const thumbH = Math.max(16, trackH * (LOGICAL_HEIGHT / MAP_HEIGHT));
+      const scrollPct = this.maxCameraY > 0 ? (this.cameraY / this.maxCameraY) : 0;
+      const thumbY = trackY + scrollPct * (trackH - thumbH);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(trackX - 1, thumbY, trackW + 2, thumbH);
+
+      ctx.restore(); // Restore Viewport Clip
+      ctx.restore(); // Restore Logical Scale
     }
 
     // --- USER INTERACTION ---
@@ -2160,6 +3596,9 @@
         }
         this.renderProfileUI();
         document.getElementById('profile-modal')?.classList.add('hidden');
+        if (document.getElementById('main-menu')?.classList.contains('active')) {
+          this.menuBattle?.resume();
+        }
       });
 
       // Close modal generic handlers
@@ -2168,7 +3607,19 @@
           this.sound.buttonClick();
           const targetId = btn.getAttribute('data-close');
           document.getElementById(targetId)?.classList.add('hidden');
+          if (document.getElementById('main-menu')?.classList.contains('active')) {
+            this.menuBattle?.resume();
+          }
         });
+      });
+
+      // Pause/resume background battle on tab visibility change
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.menuBattle?.pause();
+        } else if (document.getElementById('main-menu')?.classList.contains('active')) {
+          this.menuBattle?.resume();
+        }
       });
 
       // In-game HUD actions
@@ -2228,10 +3679,24 @@
           if (this.selectedBuildType === type) {
             this.selectedBuildType = null;
             card.classList.remove('selected');
+            if (!this.selectedTile) {
+              document.getElementById('tile-selection-hint')?.classList.add('hidden');
+            }
           } else {
             this.selectedBuildType = type;
             document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
+            // If a tile was already selected, build it directly onto that tile!
+            if (this.selectedTile) {
+              this.buildTowerOnTile(this.selectedTile.col, this.selectedTile.row, type);
+            } else {
+              const hint = document.getElementById('tile-selection-hint');
+              const text = document.getElementById('tile-selection-text');
+              if (hint && text) {
+                text.textContent = `Tap any green grass block to build ${type}`;
+                hint.classList.remove('hidden');
+              }
+            }
           }
         });
       });
@@ -2316,26 +3781,7 @@
         });
       });
 
-      // Network Connection Status detection (ONLINE / OFFLINE)
-      const updateConnectionStatus = () => {
-        const isOnline = typeof navigator.onLine === 'boolean' ? navigator.onLine : true;
-        const statusEl = document.getElementById('connection-status');
-        if (statusEl) {
-          if (isOnline) {
-            statusEl.className = 'connection-status online';
-            statusEl.innerHTML = '<span class="status-indicator">🟢</span> <span class="status-text">ONLINE</span>';
-          } else {
-            statusEl.className = 'connection-status offline';
-            statusEl.innerHTML = '<span class="status-indicator">⚪</span> <span class="status-text">OFFLINE</span>';
-          }
-        }
-      };
-
-      window.addEventListener('online', updateConnectionStatus);
-      window.addEventListener('offline', updateConnectionStatus);
-      updateConnectionStatus();
-
-      // Offline Service Worker registration
+      // 100% Offline Service Worker registration
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       }
@@ -2356,36 +3802,134 @@
         location.reload();
       });
 
-      // Canvas Pointer & Tap Handling
-      if (this.canvas) {
-        const handleTap = (clientX, clientY) => {
-          const pt = this.screenToLogical(clientX, clientY);
-          // Check if tapped near any tower slot
-          for (let slot of TOWER_SLOTS) {
-            const d = Math.hypot(slot.x - pt.x, slot.y - pt.y);
-            if (d <= 22) {
-              this.sound.buttonClick();
-              this.selectSlot(slot);
-              return;
-            }
+      // Quick Camera Navigation Buttons
+      document.getElementById('btn-scroll-top')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.targetCameraY = 0;
+      });
+
+      document.getElementById('btn-scroll-castle')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.targetCameraY = this.maxCameraY;
+      });
+
+      document.getElementById('btn-cancel-placement')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.clearTileSelection();
+      });
+
+      // Free Grid Tower Selection Modal listeners
+      document.querySelectorAll('.tower-select-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-build');
+          if (this.selectedTile && type) {
+            this.buildTowerOnTile(this.selectedTile.col, this.selectedTile.row, type);
           }
-          // Clicked outside any tower slot: close inspector
-          this.closeInspector();
+        });
+      });
+
+      document.getElementById('btn-close-tower-modal')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.closeTowerSelectModal();
+      });
+
+      document.getElementById('btn-cancel-tower-modal')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.closeTowerSelectModal();
+      });
+
+      // Canvas Pointer, Drag-Scroll, Hover & Tap Handling
+      if (this.canvas) {
+        let isPointerDown = false;
+        let startX = 0;
+        let startY = 0;
+        let lastY = 0;
+        let hasMoved = false;
+
+        const getCoords = (e) => {
+          if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+          return { x: e.clientX, y: e.clientY };
         };
 
-        this.canvas.addEventListener('click', (e) => {
-          handleTap(e.clientX, e.clientY);
-        });
+        const onDown = (e) => {
+          isPointerDown = true;
+          const pos = getCoords(e);
+          startX = pos.x;
+          startY = pos.y;
+          lastY = pos.y;
+          hasMoved = false;
+        };
 
-        this.canvas.addEventListener('touchstart', (e) => {
-          if (e.touches && e.touches.length > 0) {
-            handleTap(e.touches[0].clientX, e.touches[0].clientY);
+        const onMove = (e) => {
+          const pos = getCoords(e);
+          // Update hover tile on battlefield
+          const pt = this.screenToLogical(pos.x, pos.y);
+          const worldX = pt.x;
+          const worldY = pt.y + this.cameraY;
+          const col = Math.floor(worldX / TILE_SIZE);
+          const row = Math.floor(worldY / TILE_SIZE);
+          if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
+            this.hoverTile = { col, row };
+          } else {
+            this.hoverTile = null;
           }
-        }, { passive: true });
+
+          if (!isPointerDown) return;
+
+          const dy = pos.y - lastY;
+          lastY = pos.y;
+
+          if (Math.abs(pos.y - startY) > 6 || Math.abs(pos.x - startX) > 6) {
+            hasMoved = true;
+          }
+
+          if (hasMoved) {
+            // Drag-scroll battlefield camera vertically
+            const deltaWorldY = dy / (this.scale || 1);
+            this.targetCameraY = Math.max(0, Math.min(this.maxCameraY, this.targetCameraY - deltaWorldY));
+            this.cameraY = this.targetCameraY;
+          }
+        };
+
+        const onUp = (e) => {
+          if (!isPointerDown) return;
+          isPointerDown = false;
+
+          // If was not dragged, treat as tap / click
+          if (!hasMoved) {
+            const pt = this.screenToLogical(startX, startY);
+            const worldX = pt.x;
+            const worldY = pt.y + this.cameraY;
+            const col = Math.floor(worldX / TILE_SIZE);
+            const row = Math.floor(worldY / TILE_SIZE);
+            this.handleTileClick(col, row);
+          }
+        };
+
+        this.canvas.addEventListener('mousedown', onDown);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+
+        this.canvas.addEventListener('touchstart', onDown, { passive: true });
+        this.canvas.addEventListener('touchmove', onMove, { passive: true });
+        this.canvas.addEventListener('touchend', onUp, { passive: true });
+        this.canvas.addEventListener('touchcancel', () => { isPointerDown = false; });
+
+        this.canvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          this.targetCameraY = Math.max(0, Math.min(this.maxCameraY, this.targetCameraY + e.deltaY * 0.7));
+        }, { passive: false });
+
+        this.canvas.addEventListener('mouseleave', () => {
+          this.hoverTile = null;
+        });
       }
     }
 
     openProfileModal() {
+      this.menuBattle?.pause();
       const modal = document.getElementById('profile-modal');
       const input = document.getElementById('input-player-name');
       const img = document.getElementById('profile-modal-img');
@@ -2408,6 +3952,7 @@
     }
 
     openTasksModal() {
+      this.menuBattle?.pause();
       this.syncStats();
       const list = document.getElementById('tasks-list');
       if (!list) return;
@@ -2457,6 +4002,7 @@
     }
 
     openChallengesModal() {
+      this.menuBattle?.pause();
       this.syncStats();
       const list = document.getElementById('challenges-list');
       if (!list) return;
@@ -2506,6 +4052,7 @@
     }
 
     openSettingsModal() {
+      this.menuBattle?.pause();
       document.getElementById('settings-modal')?.classList.remove('hidden');
     }
   }
@@ -2515,6 +4062,7 @@
   function resizeGame() {
     if (activeGame) {
       activeGame.resizeCanvas();
+      activeGame.menuBattle?.resize();
     }
   }
 

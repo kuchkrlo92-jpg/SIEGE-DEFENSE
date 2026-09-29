@@ -22,62 +22,82 @@
 
     <!-- MAIN MENU SCREEN -->
     <div id="main-menu" class="screen active">
-      <div class="menu-top-bar">
-        <div class="player-profile-badge" id="btn-open-profile" title="Player Profile">
-          <div class="avatar-frame">
-            <img id="menu-avatar-img" src="" alt="Avatar" class="avatar-img hidden" />
-            <div id="menu-avatar-fallback" class="avatar-fallback">🛡️</div>
+      <!-- Live Defense Battle Canvas in background -->
+      <canvas id="menu-battle-canvas" class="menu-battle-canvas"></canvas>
+      <div class="menu-battle-overlay"></div>
+
+      <!-- Main Menu UI Layer -->
+      <div class="menu-content-layer">
+        <div class="menu-top-bar">
+          <div class="player-profile-badge" id="btn-open-profile" title="Player Profile">
+            <div class="avatar-frame">
+              <img id="menu-avatar-img" src="" alt="Avatar" class="avatar-img hidden" />
+              <div id="menu-avatar-fallback" class="avatar-fallback">👤</div>
+            </div>
+            <div class="player-info">
+              <span id="menu-player-name" class="player-name">Your Player</span>
+            </div>
           </div>
-          <div class="player-info">
-            <span class="player-label">COMMANDER</span>
-            <span id="menu-player-name" class="player-name">Your Player</span>
-          </div>
-        </div>
-        <div class="menu-status-container">
           <div class="currency-badge">
             <span class="currency-icon">💰</span>
             <span id="menu-money-display" class="currency-amount">Rs 0</span>
           </div>
-          <div id="connection-status" class="connection-status online" title="Network Connection Status">
-            <span class="status-indicator">🟢</span>
-            <span class="status-text">ONLINE</span>
+        </div>
+
+        <div class="menu-hero">
+          <div class="game-logo">
+            <div class="logo-shield">🏰</div>
+            <h1 class="logo-title">SIEGE DEFENSE</h1>
+            <p class="logo-subtitle">ENDLESS REALM GUARDIAN</p>
           </div>
         </div>
-      </div>
 
-      <div class="menu-hero">
-        <div class="game-logo">
-          <div class="logo-shield">🏰</div>
-          <h1 class="logo-title">SIEGE DEFENSE</h1>
-          <p class="logo-subtitle">ENDLESS REALM GUARDIAN</p>
+        <div class="menu-actions">
+          <button id="btn-start" class="btn-menu btn-primary">
+            <span class="btn-icon">⚔️</span>
+            <span class="btn-text">START</span>
+          </button>
+          <button id="btn-task" class="btn-menu btn-secondary">
+            <span class="btn-icon">📜</span>
+            <span class="btn-text">TASK</span>
+            <span id="task-badge" class="badge hidden">!</span>
+          </button>
+          <button id="btn-challenge" class="btn-menu btn-secondary">
+            <span class="btn-icon">🏆</span>
+            <span class="btn-text">CHALLENGE</span>
+            <span id="challenge-badge" class="badge hidden">!</span>
+          </button>
+          <button id="btn-settings" class="btn-menu btn-secondary">
+            <span class="btn-icon">⚙️</span>
+            <span class="btn-text">SETTINGS</span>
+          </button>
+          <button id="btn-exit" class="btn-menu btn-danger">
+            <span class="btn-icon">🚪</span>
+            <span class="btn-text">EXIT</span>
+          </button>
+        </div>
+        <div class="menu-footer">100% Offline Game • Endless Realm Guardian</div>
+      </div>
+    </div>
+
+    <!-- DEDICATED CHALLENGES SCREEN -->
+    <div id="challenges-screen" class="screen">
+      <div class="challenges-screen-header">
+        <button id="btn-challenges-back" class="btn-back-nav">← BACK</button>
+        <div class="challenges-title-box">
+          <h1 class="challenges-main-title">CHALLENGES</h1>
+          <div id="challenges-count-badge" class="challenges-count-badge">Completed: 0 / 100</div>
+        </div>
+        <div class="challenges-currency-badge">
+          <span>💰</span>
+          <span id="challenges-money-val">Rs 0</span>
         </div>
       </div>
-
-      <div class="menu-actions">
-        <button id="btn-start" class="btn-menu btn-primary">
-          <span class="btn-icon">⚔️</span>
-          <span class="btn-text">START</span>
-        </button>
-        <button id="btn-task" class="btn-menu btn-secondary">
-          <span class="btn-icon">📜</span>
-          <span class="btn-text">TASK</span>
-          <span id="task-badge" class="badge hidden">!</span>
-        </button>
-        <button id="btn-challenge" class="btn-menu btn-secondary">
-          <span class="btn-icon">🏆</span>
-          <span class="btn-text">CHALLENGE</span>
-          <span id="challenge-badge" class="badge hidden">!</span>
-        </button>
-        <button id="btn-settings" class="btn-menu btn-secondary">
-          <span class="btn-icon">⚙️</span>
-          <span class="btn-text">SETTINGS</span>
-        </button>
-        <button id="btn-exit" class="btn-menu btn-danger">
-          <span class="btn-icon">🚪</span>
-          <span class="btn-text">EXIT</span>
-        </button>
+      <div class="challenges-scroll-container">
+        <div id="challenges-grid-list" class="challenges-cards-list">
+          <!-- 100 Challenge Cards dynamically rendered here -->
+        </div>
       </div>
-      <div class="menu-footer">Vertical 9:16 Edition • High Definition</div>
     </div>
 
     <!-- GAMEPLAY SCREEN -->
@@ -103,6 +123,18 @@
         </div>
       </div>
 
+      <!-- Challenge Active In-Game HUD Panel -->
+      <div id="active-challenge-hud" class="active-challenge-hud hidden">
+        <div class="challenge-hud-row">
+          <span class="challenge-hud-badge">🎯 CHALLENGE</span>
+          <span id="challenge-hud-name" class="challenge-hud-title">SURVIVE 5 WAVES</span>
+        </div>
+        <div class="challenge-hud-progress-row">
+          <span id="challenge-hud-desc" class="challenge-hud-desc">Progress: 0 / 5</span>
+          <span id="challenge-hud-timer" class="challenge-hud-timer hidden">⏱️ 02:00</span>
+        </div>
+      </div>
+
       <!-- Wave Announcement Banner -->
       <div id="wave-banner" class="wave-banner hidden">
         <div id="wave-banner-text" class="wave-banner-title">WAVE 1</div>
@@ -112,6 +144,19 @@
       <!-- Battle Canvas Area -->
       <div id="canvas-container">
         <canvas id="game-canvas"></canvas>
+
+        <!-- Quick Map Camera Navigation -->
+        <div id="map-scroll-controls" class="map-scroll-controls">
+          <button id="btn-scroll-top" class="btn-scroll-nav" title="View Enemy Spawn">⬆️ SPAWN</button>
+          <button id="btn-scroll-castle" class="btn-scroll-nav" title="View Castle">⬇️ CASTLE</button>
+        </div>
+
+        <!-- Selected Tile Build Banner -->
+        <div id="tile-selection-hint" class="tile-selection-hint hidden">
+          <div class="tile-hint-badge">📍 Selected Tile</div>
+          <span id="tile-selection-text">Tap a tower below to build</span>
+          <button id="btn-cancel-placement" class="btn-cancel-placement" title="Cancel Selection">✕</button>
+        </div>
       </div>
 
       <!-- Bottom Build & Control Bar -->
@@ -185,6 +230,54 @@
             <span>💰 Sell</span>
             <span id="insp-sell-refund" class="cost-tag">+Rs 70</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Free Grid Tower Selection Modal -->
+      <div id="tile-tower-modal" class="tile-tower-modal hidden">
+        <div class="tower-select-panel">
+          <div class="tower-select-header">
+            <div>
+              <div class="tower-select-title">🏰 Build Defense Tower</div>
+              <div id="tile-select-coord" class="tower-select-coord">Grass Block</div>
+            </div>
+            <button id="btn-close-tower-modal" class="btn-cancel-placement" title="Close">✕</button>
+          </div>
+          <div class="tower-options-list">
+            <button class="tower-select-option" data-build="archer">
+              <span class="tower-opt-icon">🏹</span>
+              <div class="tower-opt-details">
+                <span class="tower-opt-name">Archer</span>
+                <span class="tower-opt-sub">Fast physical arrows</span>
+              </div>
+              <span class="tower-opt-cost">Rs 100</span>
+            </button>
+            <button class="tower-select-option" data-build="cannon">
+              <span class="tower-opt-icon">💣</span>
+              <div class="tower-opt-details">
+                <span class="tower-opt-name">Cannon</span>
+                <span class="tower-opt-sub">Blast area damage</span>
+              </div>
+              <span class="tower-opt-cost">Rs 150</span>
+            </button>
+            <button class="tower-select-option" data-build="magic">
+              <span class="tower-opt-icon">🔮</span>
+              <div class="tower-opt-details">
+                <span class="tower-opt-name">Magic</span>
+                <span class="tower-opt-sub">Frost slows enemies</span>
+              </div>
+              <span class="tower-opt-cost">Rs 175</span>
+            </button>
+            <button class="tower-select-option" data-build="lightning">
+              <span class="tower-opt-icon">⚡</span>
+              <div class="tower-opt-details">
+                <span class="tower-opt-name">Lightning</span>
+                <span class="tower-opt-sub">Chain 3 enemies</span>
+              </div>
+              <span class="tower-opt-cost">Rs 225</span>
+            </button>
+          </div>
+          <button id="btn-cancel-tower-modal" class="btn-cancel-select">CANCEL</button>
         </div>
       </div>
     </div>
@@ -430,6 +523,46 @@
         <div class="pause-actions">
           <button id="btn-resume" class="btn-primary full-width">RESUME</button>
           <button id="btn-pause-menu" class="btn-secondary full-width">EXIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGE COMPLETE MODAL -->
+    <div id="challenge-complete-modal" class="modal-overlay hidden">
+      <div class="modal-card challenge-result-card victory-card">
+        <div class="result-trophy">🏆</div>
+        <h1 class="result-title complete-title">CHALLENGE COMPLETE!</h1>
+        <div id="comp-ch-name" class="result-subtitle">Challenge: Survive 5 Waves</div>
+        <div class="result-reward-box">
+          <span class="reward-lbl">Reward:</span>
+          <span id="comp-ch-reward" class="reward-val">+Rs 100</span>
+        </div>
+        <div class="result-actions">
+          <button id="btn-claim-challenge-reward" class="btn-primary full-width">CLAIM REWARD</button>
+          <button id="btn-back-challenges-from-win" class="btn-secondary full-width hidden">BACK TO CHALLENGES</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGE FAILED MODAL -->
+    <div id="challenge-failed-modal" class="modal-overlay hidden">
+      <div class="modal-card challenge-result-card defeat-card">
+        <div class="result-trophy">💀</div>
+        <h1 class="result-title failed-title">CHALLENGE FAILED</h1>
+        <div id="fail-ch-name" class="result-subtitle">Challenge: Survive 5 Waves</div>
+        <div class="result-stats-box">
+          <div class="res-stat-item">
+            <span class="res-stat-lbl">Kills:</span>
+            <span id="fail-ch-kills" class="res-stat-val">0</span>
+          </div>
+          <div class="res-stat-item">
+            <span class="res-stat-lbl">Playing Duration:</span>
+            <span id="fail-ch-duration" class="res-stat-val">00:00</span>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="btn-retry-challenge" class="btn-primary full-width">RETRY</button>
+          <button id="btn-back-challenges-from-fail" class="btn-secondary full-width">BACK TO CHALLENGES</button>
         </div>
       </div>
     </div>
