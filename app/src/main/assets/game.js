@@ -391,6 +391,8 @@
     return list;
   }
 
+  const create100Challenges = generate100Challenges;
+
   // --- DIFFICULTY CONFIGURATION ---
   const DIFFICULTY_CONFIG = {
     easy: {
@@ -2259,9 +2261,27 @@
 
     // --- SCREEN NAVIGATION ---
     showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const allScreens = [
+        document.getElementById('main-menu'),
+        document.getElementById('challenges-screen'),
+        document.getElementById('gameplay-screen'),
+        document.getElementById('game-over-screen'),
+        document.getElementById('victory-screen'),
+        document.getElementById('exit-screen')
+      ];
+
+      allScreens.forEach(sc => {
+        if (sc) {
+          sc.style.display = 'none';
+          sc.classList.remove('active');
+        }
+      });
+
       const sc = document.getElementById(id);
-      if (sc) sc.classList.add('active');
+      if (sc) {
+        sc.style.display = 'flex';
+        sc.classList.add('active');
+      }
 
       if (this.menuBattle) {
         if (id === 'main-menu') {
@@ -4026,8 +4046,12 @@
           pModal.classList.toggle('hidden', !this.isPaused);
           const pw = document.getElementById('pause-wave-num');
           const pd = document.getElementById('pause-duration');
+          const pExitBtn = document.getElementById('btn-pause-menu');
           if (pw) pw.textContent = this.wave.toString();
           if (pd) pd.textContent = this.formatDuration(this.sessionDurationSec);
+          if (pExitBtn) {
+            pExitBtn.textContent = this.isChallengeMode ? 'EXIT CHALLENGE' : 'EXIT TO MENU';
+          }
         }
       });
 
@@ -4039,18 +4063,26 @@
 
       document.getElementById('btn-pause-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
-        this.isPaused = false;
-        this.isPlaying = false;
-        this.sound.stopMusic();
-        document.getElementById('pause-modal')?.classList.add('hidden');
-        this.showScreen('main-menu');
+        if (this.isChallengeMode) {
+          this.exitCurrentChallenge();
+        } else {
+          this.isPaused = false;
+          this.isPlaying = false;
+          this.sound.stopMusic();
+          document.getElementById('pause-modal')?.classList.add('hidden');
+          this.showScreen('main-menu');
+        }
       });
 
       document.getElementById('btn-ingame-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
-        this.isPlaying = false;
-        this.sound.stopMusic();
-        this.showScreen('main-menu');
+        if (this.isChallengeMode) {
+          this.exitCurrentChallenge();
+        } else {
+          this.isPlaying = false;
+          this.sound.stopMusic();
+          this.showScreen('main-menu');
+        }
       });
 
       // Tower Cards Selector in bottom bar
@@ -4383,9 +4415,51 @@
       document.getElementById('tasks-modal')?.classList.remove('hidden');
     }
 
+    initializeChallenges() {
+      if (!this.challenges || !Array.isArray(this.challenges) || this.challenges.length !== 100) {
+        this.challenges = create100Challenges();
+        Storage.saveChallenges(this.challenges);
+        this.saveAll();
+      } else {
+        const completedCount = this.challenges.filter(c => c.completed).length;
+        this.challenges.forEach(c => {
+          if (!c.numStr) {
+            c.numStr = `Challenge ${c.id < 10 ? '0' + c.id : c.id}`;
+          }
+          if (typeof c.progress !== 'number') c.progress = 0;
+          c.unlocked = (c.id <= 5) || !!c.completed || (completedCount >= (c.reqCompleted || c.req || 0));
+        });
+      }
+    }
+
+    openChallenges() {
+      this.openChallengesScreen();
+    }
+
+    closeChallenges() {
+      this.showScreen('main-menu');
+    }
+
+    exitCurrentChallenge() {
+      this.isPlaying = false;
+      this.isPaused = false;
+      this.sound.stopMusic();
+      document.getElementById('pause-modal')?.classList.add('hidden');
+      document.getElementById('challenge-complete-modal')?.classList.add('hidden');
+      document.getElementById('challenge-failed-modal')?.classList.add('hidden');
+      this.openChallengesScreen();
+    }
+
     openChallengesScreen() {
+      this.initializeChallenges();
       this.menuBattle?.pause();
       this.syncStats();
+      this.renderChallenges();
+      this.showScreen('challenges-screen');
+    }
+
+    renderChallenges() {
+      this.initializeChallenges();
 
       const moneyEl = document.getElementById('challenges-money-val');
       if (moneyEl) moneyEl.textContent = `Rs ${this.money}`;
@@ -4396,90 +4470,101 @@
 
       // Update unlock status for all challenges
       this.challenges.forEach(c => {
-        c.unlocked = (c.id <= 5) || c.completed || (completedCount >= (c.reqCompleted || 0));
+        c.unlocked = (c.id <= 5) || !!c.completed || (completedCount >= (c.reqCompleted || c.req || 0));
       });
 
       const list = document.getElementById('challenges-grid-list');
-      if (list) {
-        list.innerHTML = '';
-        this.challenges.forEach(ch => {
-          const card = document.createElement('div');
-          const isCompleted = !!ch.completed;
-          const isClaimed = !!ch.claimed;
-          const isUnlocked = !!ch.unlocked;
+      if (!list) return;
+      list.innerHTML = '';
 
-          let cardClass = 'challenge-card';
-          if (isCompleted) cardClass += ' completed';
-          else if (!isUnlocked) cardClass += ' locked';
+      this.challenges.forEach(ch => {
+        const card = document.createElement('div');
+        const isCompleted = !!ch.completed;
+        const isClaimed = !!ch.claimed;
+        const isUnlocked = !!ch.unlocked;
 
-          let statusBadgeClass = 'ch-card-status-badge';
-          let statusText = 'LOCKED';
-          if (isCompleted) {
-            if (isClaimed) {
-              statusBadgeClass += ' status-completed';
-              statusText = 'COMPLETED';
-            } else {
-              statusBadgeClass += ' status-claimable';
-              statusText = 'CLAIM REWARD';
-            }
-          } else if (isUnlocked) {
+        let cardClass = 'challenge-card';
+        if (isCompleted) cardClass += ' completed';
+        else if (!isUnlocked) cardClass += ' locked';
+
+        let statusBadgeClass = 'ch-card-status-badge';
+        let statusText = 'LOCKED';
+        if (isCompleted) {
+          if (isClaimed) {
+            statusBadgeClass += ' status-completed';
+            statusText = 'COMPLETED';
+          } else {
             statusBadgeClass += ' status-claimable';
-            statusText = 'AVAILABLE';
-          } else {
-            statusBadgeClass += ' status-locked';
-            statusText = `REQ: ${ch.reqCompleted} CLEARED`;
+            statusText = 'CLAIM REWARD';
           }
+        } else if (isUnlocked) {
+          statusBadgeClass += ' status-available';
+          statusText = 'AVAILABLE';
+        } else {
+          statusBadgeClass += ' status-locked';
+          const reqNum = ch.reqCompleted || ch.req || 0;
+          statusText = `REQ: ${reqNum} CLEARED`;
+        }
 
-          let actionBtnHtml = '';
-          if (isCompleted && !isClaimed) {
-            actionBtnHtml = `<button class="btn-challenge-claim-card" data-claim-id="${ch.id}">CLAIM +Rs ${ch.reward}</button>`;
-          } else {
-            const btnLabel = isCompleted ? 'REPLAY' : 'PLAY';
-            actionBtnHtml = `<button class="btn-challenge-play" data-play-id="${ch.id}" ${isUnlocked ? '' : 'disabled'}>${btnLabel}</button>`;
-          }
-
-          card.className = cardClass;
-          card.innerHTML = `
-            <div class="ch-card-header">
-              <span class="ch-card-num">${ch.numStr || ('Challenge ' + (ch.id < 10 ? '0' + ch.id : ch.id))}</span>
-              <span class="${statusBadgeClass}">${statusText}</span>
-            </div>
-            <div class="ch-card-title">${ch.title}</div>
-            <div class="ch-card-desc">${ch.desc}</div>
-            <div class="ch-card-bottom">
-              <span class="ch-card-reward">+Rs ${ch.reward}</span>
-              ${actionBtnHtml}
+        let actionBtnHtml = '';
+        if (isCompleted && !isClaimed) {
+          actionBtnHtml = `
+            <div class="ch-actions-row">
+              <button class="btn-challenge-claim-card" data-claim-id="${ch.id}">CLAIM +Rs ${ch.reward}</button>
+              <button class="btn-challenge-play btn-replay" data-play-id="${ch.id}">REPLAY</button>
             </div>
           `;
+        } else if (isCompleted && isClaimed) {
+          actionBtnHtml = `<button class="btn-challenge-play btn-replay" data-play-id="${ch.id}">REPLAY</button>`;
+        } else {
+          actionBtnHtml = `<button class="btn-challenge-play" data-play-id="${ch.id}" ${isUnlocked ? '' : 'disabled'}>${isUnlocked ? 'PLAY' : 'LOCKED'}</button>`;
+        }
 
-          const claimBtn = card.querySelector(`[data-claim-id="${ch.id}"]`);
-          if (claimBtn) {
-            claimBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              this.sound.coinCollect();
-              ch.claimed = true;
-              this.addMoney(ch.reward);
-              Storage.saveChallenges(this.challenges);
-              this.saveAll();
-              this.renderMenuBadges();
-              this.openChallengesScreen();
-            });
-          }
+        const currentProg = isCompleted ? ch.target : (typeof ch.progress === 'number' ? ch.progress : 0);
+        const numLabel = ch.numStr || (`Challenge ${ch.id < 10 ? '0' + ch.id : ch.id}`);
 
-          const playBtn = card.querySelector(`[data-play-id="${ch.id}"]`);
-          if (playBtn && isUnlocked) {
-            playBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              this.sound.buttonClick();
-              this.startChallenge(ch.id);
-            });
-          }
+        card.className = cardClass;
+        card.innerHTML = `
+          <div class="ch-card-header">
+            <span class="ch-card-num">${numLabel}</span>
+            <span class="${statusBadgeClass}">${statusText}</span>
+          </div>
+          <div class="ch-card-title">${ch.title}</div>
+          <div class="ch-card-desc">${ch.desc}</div>
+          <div class="ch-card-progress-row">
+            <span class="ch-progress-text">Progress: ${currentProg} / ${ch.target}</span>
+            <span class="ch-card-reward">Reward: Rs ${ch.reward}</span>
+          </div>
+          <div class="ch-card-bottom">
+            ${actionBtnHtml}
+          </div>
+        `;
 
-          list.appendChild(card);
-        });
-      }
+        const claimBtn = card.querySelector(`[data-claim-id="${ch.id}"]`);
+        if (claimBtn) {
+          claimBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.sound.coinCollect();
+            ch.claimed = true;
+            this.addMoney(ch.reward);
+            Storage.saveChallenges(this.challenges);
+            this.saveAll();
+            this.renderMenuBadges();
+            this.renderChallenges();
+          });
+        }
 
-      this.showScreen('challenges-screen');
+        const playBtn = card.querySelector(`[data-play-id="${ch.id}"]`);
+        if (playBtn && (isUnlocked || isCompleted)) {
+          playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.sound.buttonClick();
+            this.startChallenge(ch.id);
+          });
+        }
+
+        list.appendChild(card);
+      });
     }
 
     startChallenge(challengeId) {
@@ -4759,7 +4844,7 @@
       console.error('Game initialization failed:', err);
       const overlay = document.getElementById('fatal-error-overlay');
       const msg = document.getElementById('fatal-error-msg');
-      if (overlay && msg) {
+      if (overlay && msg && overlay.classList) {
         overlay.classList.remove('hidden');
         msg.textContent = 'Error: ' + (err.message || 'Game init error');
       }
@@ -4769,22 +4854,47 @@
   window.addEventListener('error', (event) => {
     const overlay = document.getElementById('fatal-error-overlay');
     const msg = document.getElementById('fatal-error-msg');
-    if (overlay && msg) {
+    if (overlay && msg && overlay.classList) {
       overlay.classList.remove('hidden');
       msg.textContent = 'Runtime Notice: ' + (event.message || 'Unexpected issue');
     }
   });
 
+  // Global API hooks
+  window.create100Challenges = create100Challenges;
+  window.generate100Challenges = generate100Challenges;
+  window.openChallenges = () => activeGame?.openChallengesScreen();
+  window.closeChallenges = () => activeGame?.closeChallenges();
+  window.initializeChallenges = () => activeGame?.initializeChallenges();
+  window.renderChallenges = () => activeGame?.renderChallenges();
+
   window.addEventListener('resize', resizeGame);
   window.addEventListener('orientationchange', resizeGame);
+
+  function attachChallengeDirectListeners() {
+    const btnCh = document.getElementById('btn-challenge');
+    if (btnCh) {
+      btnCh.addEventListener('click', () => {
+        activeGame?.openChallengesScreen();
+      });
+    }
+    const btnBack = document.getElementById('btn-challenges-back');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        activeGame?.closeChallenges();
+      });
+    }
+  }
 
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => {
       initializeGame();
       resizeGame();
+      attachChallengeDirectListeners();
     });
   } else {
     initializeGame();
     resizeGame();
+    attachChallengeDirectListeners();
   }
 })();
