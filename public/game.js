@@ -856,14 +856,14 @@
 
       // Defensive towers placed beside the path actively fighting
       this.towers = [
-        { type: 'archer', x: 125, y: 80, range: 90, interval: 0.65, cooldown: 0.2, angle: 0, color: '#22c55e', icon: '🏹', name: 'Archer Tower' },
-        { type: 'archer', x: 235, y: 390, range: 90, interval: 0.6, cooldown: 0.4, angle: 0, color: '#22c55e', icon: '🏹', name: 'Archer Tower' },
-        { type: 'cannon', x: 235, y: 175, range: 85, interval: 1.5, cooldown: 0.7, angle: 0, color: '#ef4444', icon: '💣', name: 'Cannon Tower' },
-        { type: 'cannon', x: 125, y: 440, range: 85, interval: 1.4, cooldown: 1.1, angle: 0, color: '#ef4444', icon: '💣', name: 'Cannon Tower' },
-        { type: 'magic', x: 125, y: 230, range: 95, interval: 1.0, cooldown: 0.1, angle: 0, color: '#8b5cf6', icon: '🔮', name: 'Magic Tower' },
-        { type: 'magic', x: 235, y: 515, range: 95, interval: 0.95, cooldown: 0.5, angle: 0, color: '#8b5cf6', icon: '🔮', name: 'Magic Tower' },
-        { type: 'lightning', x: 235, y: 290, range: 105, interval: 1.1, cooldown: 0.3, angle: 0, color: '#f59e0b', icon: '⚡', name: 'Lightning Tower' },
-        { type: 'lightning', x: 125, y: 335, range: 105, interval: 1.15, cooldown: 0.8, angle: 0, color: '#f59e0b', icon: '⚡', name: 'Lightning Tower' }
+        { type: 'archer', x: 125, y: 80, range: 95, interval: 0.65, cooldown: 0.2, angle: 0, recoil: 0, color: '#22c55e', name: 'Archer Tower' },
+        { type: 'archer', x: 235, y: 390, range: 95, interval: 0.6, cooldown: 0.4, angle: 0, recoil: 0, color: '#22c55e', name: 'Archer Tower' },
+        { type: 'cannon', x: 235, y: 175, range: 90, interval: 1.4, cooldown: 0.6, angle: 0, recoil: 0, color: '#ef4444', name: 'Cannon Tower' },
+        { type: 'cannon', x: 125, y: 440, range: 90, interval: 1.3, cooldown: 1.0, angle: 0, recoil: 0, color: '#ef4444', name: 'Cannon Tower' },
+        { type: 'magic', x: 125, y: 230, range: 100, interval: 1.0, cooldown: 0.1, angle: 0, energy: 0, color: '#8b5cf6', name: 'Magic Tower' },
+        { type: 'magic', x: 235, y: 515, range: 100, interval: 0.95, cooldown: 0.5, angle: 0, energy: 0, color: '#8b5cf6', name: 'Magic Tower' },
+        { type: 'lightning', x: 235, y: 290, range: 110, interval: 1.1, cooldown: 0.3, angle: 0, charge: 0, color: '#f59e0b', name: 'Lightning Tower' },
+        { type: 'lightning', x: 125, y: 335, range: 110, interval: 1.15, cooldown: 0.8, angle: 0, charge: 0, color: '#f59e0b', name: 'Lightning Tower' }
       ];
 
       this.enemies = [];
@@ -872,9 +872,10 @@
       this.floatingTexts = [];
       this.lightningArcs = [];
 
-      this.spawnTimer = 0.8;
+      this.spawnTimer = 0.6;
       this.castleHitTimer = 0;
       this.smokeTimer = 0;
+      this.castleShootTimer = 1.0;
 
       this.seedInitialBattle();
       this.resize();
@@ -882,27 +883,29 @@
     }
 
     seedInitialBattle() {
-      // Seed 5 staggered enemies across the path for instant active battle
+      // Seed 6 staggered enemies across the path for immediate active battle
       const seeds = [
-        { type: 'basic', dist: 70 },
-        { type: 'fast',  dist: 160 },
-        { type: 'heavy', dist: 270 },
-        { type: 'flying', dist: 380 },
-        { type: 'basic', dist: 490 }
+        { type: 'basic', dist: 60 },
+        { type: 'fast',  dist: 150 },
+        { type: 'heavy', dist: 250 },
+        { type: 'flying', dist: 350 },
+        { type: 'basic', dist: 450 },
+        { type: 'fast',  dist: 520 }
       ];
       seeds.forEach(s => this.spawnEnemy(s.type, s.dist));
     }
 
     spawnEnemy(typeKey, initialDist = -15) {
       const defs = {
-        basic: { name: 'Goblin Scout', color: '#10b981', icon: '👺', radius: 9, hp: 65, maxHp: 65, speed: 45, flying: false },
-        fast:  { name: 'Shadow Imp', color: '#f97316', icon: '🐺', radius: 8, hp: 45, maxHp: 45, speed: 65, flying: false },
-        heavy: { name: 'Armored Orc', color: '#64748b', icon: '🐗', radius: 12, hp: 170, maxHp: 170, speed: 28, flying: false },
-        flying: { name: 'Winged Harpy', color: '#a855f7', icon: '🦇', radius: 10, hp: 75, maxHp: 75, speed: 52, flying: true }
+        basic: { name: 'Goblin Scout', color: '#10b981', radius: 9, hp: 60, maxHp: 60, speed: 44, flying: false },
+        fast:  { name: 'Shadow Imp', color: '#f97316', radius: 8, hp: 45, maxHp: 45, speed: 64, flying: false },
+        heavy: { name: 'Armored Orc', color: '#64748b', radius: 12, hp: 160, maxHp: 160, speed: 28, flying: false },
+        flying: { name: 'Winged Harpy', color: '#a855f7', radius: 10, hp: 70, maxHp: 70, speed: 50, flying: true }
       };
       const def = defs[typeKey] || defs.basic;
       const pos = this.getPathPosition(initialDist);
       this.enemies.push({
+        type: typeKey,
         ...def,
         dist: initialDist,
         x: pos.x,
@@ -974,30 +977,63 @@
     update(dt) {
       if (this.castleHitTimer > 0) this.castleHitTimer -= dt;
 
-      // Spawn subtle chimney / hearth smoke
+      // Chimney & environmental dust effects
       this.smokeTimer -= dt;
       if (this.smokeTimer <= 0) {
-        this.smokeTimer = 0.25;
+        this.smokeTimer = 0.2;
         this.particles.push({
-          x: 175 + (Math.random() - 0.5) * 20,
-          y: 545,
+          x: 180 + (Math.random() - 0.5) * 22,
+          y: 540,
           vx: (Math.random() - 0.5) * 8,
-          vy: -18 - Math.random() * 12,
+          vy: -20 - Math.random() * 12,
           color: 'rgba(148, 163, 184, 0.45)',
           size: 3 + Math.random() * 3,
-          maxLife: 1.2,
-          life: 1.2,
+          maxLife: 1.3,
+          life: 1.3,
           alpha: 0.5
         });
       }
 
-      // Spawn regular enemies continuously
+      // Continuous enemy spawning
       this.spawnTimer -= dt;
       if (this.spawnTimer <= 0) {
         const types = ['basic', 'fast', 'heavy', 'flying'];
         const chosen = types[Math.floor(Math.random() * types.length)];
         this.spawnEnemy(chosen);
-        this.spawnTimer = 1.7 + Math.random() * 0.9;
+        this.spawnTimer = 1.6 + Math.random() * 0.9;
+      }
+
+      // Castle Defensive Activity: Wall archers fire defensive arrows
+      this.castleShootTimer -= dt;
+      if (this.castleShootTimer <= 0) {
+        this.castleShootTimer = 1.1;
+        // Check for enemies within castle defense range (y > 430)
+        let castleTarget = null;
+        let maxDist = -1;
+        for (let e of this.enemies) {
+          if (e.y > 430 && e.dist > maxDist) {
+            maxDist = e.dist;
+            castleTarget = e;
+          }
+        }
+        if (castleTarget) {
+          const turretSide = Math.random() > 0.5 ? -45 : 45;
+          const originX = 180 + turretSide;
+          const originY = 545;
+          const ang = Math.atan2(castleTarget.y - originY, castleTarget.x - originX);
+          this.projectiles.push({
+            type: 'arrow',
+            x: originX,
+            y: originY,
+            target: castleTarget,
+            targetX: castleTarget.x,
+            targetY: castleTarget.y,
+            angle: ang,
+            speed: 340,
+            damage: 20,
+            life: 1.2
+          });
+        }
       }
 
       // Update enemies
@@ -1015,22 +1051,22 @@
         e.y = pos.y;
         e.angle = pos.angle;
 
-        // Reached castle
+        // Occasional enemy reaching castle to trigger active battle impact!
         if (e.dist >= this.totalPathLength - 10) {
-          this.castleHitTimer = 0.45;
-          // Spawn impact dust & sparks
-          for (let k = 0; k < 12; k++) {
+          this.castleHitTimer = 0.5;
+          // Spawn impact blast, sparks, and stone dust
+          for (let k = 0; k < 16; k++) {
             const ang = Math.random() * Math.PI * 2;
-            const spd = 25 + Math.random() * 50;
+            const spd = 30 + Math.random() * 65;
             this.particles.push({
               x: 180,
               y: 575,
               vx: Math.cos(ang) * spd,
               vy: Math.sin(ang) * spd,
-              color: Math.random() > 0.5 ? '#ef4444' : '#fbbf24',
-              size: 2.5 + Math.random() * 2.5,
-              maxLife: 0.45,
-              life: 0.45,
+              color: Math.random() > 0.4 ? '#ef4444' : '#fbbf24',
+              size: 2.5 + Math.random() * 3,
+              maxLife: 0.5,
+              life: 0.5,
               alpha: 1
             });
           }
@@ -1038,14 +1074,16 @@
         }
       }
 
-      // Update Towers combat
+      // Update Towers: combat targeting and recoil
       for (let t of this.towers) {
+        if (t.recoil > 0) t.recoil = Math.max(0, t.recoil - dt * 4.5);
         t.cooldown -= dt;
-        // Find nearest valid target
+
+        // Find nearest valid enemy in range
         let target = null;
         let minDist = t.range;
         for (let e of this.enemies) {
-          if (t.type === 'cannon' && e.flying) continue; // Cannon can't hit flying harpies
+          if (t.type === 'cannon' && e.flying) continue; // Cannons don't target flying harpies
           const d = Math.hypot(e.x - t.x, e.y - t.y);
           if (d <= minDist) {
             minDist = d;
@@ -1057,6 +1095,7 @@
           t.angle = Math.atan2(target.y - t.y, target.x - t.x);
           if (t.cooldown <= 0) {
             t.cooldown = t.interval;
+            t.recoil = 1.0;
             this.towerShoot(t, target);
           }
         }
@@ -1072,7 +1111,6 @@
         }
 
         if (p.type === 'arrow' || p.type === 'frostbolt') {
-          // Travel toward target
           if (p.target && this.enemies.includes(p.target)) {
             p.targetX = p.target.x;
             p.targetY = p.target.y;
@@ -1080,7 +1118,7 @@
           const dx = p.targetX - p.x;
           const dy = p.targetY - p.y;
           const d = Math.hypot(dx, dy);
-          if (d < 12) {
+          if (d < 14) {
             this.onProjectileHit(p);
             this.projectiles.splice(i, 1);
           } else {
@@ -1088,16 +1126,16 @@
             p.x += (dx / d) * step;
             p.y += (dy / d) * step;
             p.angle = Math.atan2(dy, dx);
-            if (p.type === 'frostbolt' && Math.random() > 0.4) {
+            if (p.type === 'frostbolt' && Math.random() > 0.3) {
               this.particles.push({
                 x: p.x, y: p.y,
                 vx: (Math.random() - 0.5) * 15,
                 vy: (Math.random() - 0.5) * 15,
                 color: '#38bdf8',
-                size: 2,
+                size: 2.2,
                 maxLife: 0.25,
                 life: 0.25,
-                alpha: 0.8
+                alpha: 0.9
               });
             }
           }
@@ -1106,16 +1144,16 @@
           p.x = p.startX + (p.targetX - p.startX) * p.progress;
           p.y = p.startY + (p.targetY - p.startY) * p.progress - 4 * p.arcHeight * p.progress * (1 - p.progress);
 
-          // Smoke trail
-          if (Math.random() > 0.3) {
+          // Smoke puffs along arc
+          if (Math.random() > 0.25) {
             this.particles.push({
               x: p.x, y: p.y,
-              vx: (Math.random() - 0.5) * 10,
-              vy: (Math.random() - 0.5) * 10,
+              vx: (Math.random() - 0.5) * 8,
+              vy: (Math.random() - 0.5) * 8,
               color: 'rgba(100, 116, 139, 0.6)',
-              size: 2.5,
-              maxLife: 0.3,
-              life: 0.3,
+              size: 2.8,
+              maxLife: 0.35,
+              life: 0.35,
               alpha: 0.6
             });
           }
@@ -1171,24 +1209,38 @@
           targetX: target.x,
           targetY: target.y,
           angle: tower.angle,
-          speed: 320,
+          speed: 340,
           damage: 18,
           life: 1.2
         });
       } else if (tower.type === 'cannon') {
+        // Muzzle flash particle
+        const mx = tower.x + Math.cos(tower.angle) * 16;
+        const my = tower.y + Math.sin(tower.angle) * 16;
+        this.particles.push({
+          x: mx, y: my,
+          vx: Math.cos(tower.angle) * 20,
+          vy: Math.sin(tower.angle) * 20,
+          color: '#fbbf24',
+          size: 5,
+          maxLife: 0.12,
+          life: 0.12,
+          alpha: 1
+        });
+
         this.projectiles.push({
           type: 'cannonball',
-          startX: tower.x,
-          startY: tower.y,
-          x: tower.x,
-          y: tower.y,
+          startX: mx,
+          startY: my,
+          x: mx,
+          y: my,
           targetX: target.x,
           targetY: target.y,
           progress: 0,
           duration: 0.6,
-          arcHeight: 35,
-          splashRadius: 42,
-          damage: 48,
+          arcHeight: 38,
+          splashRadius: 44,
+          damage: 50,
           life: 1.5
         });
       } else if (tower.type === 'magic') {
@@ -1199,19 +1251,19 @@
           target,
           targetX: target.x,
           targetY: target.y,
-          speed: 240,
-          damage: 22,
+          speed: 250,
+          damage: 24,
           slowDuration: 2.2,
-          slowFactor: 0.55,
+          slowFactor: 0.5,
           life: 1.2
         });
       } else if (tower.type === 'lightning') {
-        // Chain lightning jump between up to 3 enemies
+        // Jump between up to 3 enemies
         const chained = [target];
         let curr = target;
         for (let step = 1; step < 3; step++) {
           let nearest = null;
-          let minD = 90;
+          let minD = 95;
           for (let e of this.enemies) {
             if (!chained.includes(e)) {
               const d = Math.hypot(e.x - curr.x, e.y - curr.y);
@@ -1232,10 +1284,10 @@
           this.lightningArcs.push({
             x1: prev.x, y1: prev.y,
             x2: e.x, y2: e.y,
-            life: 0.16
+            life: 0.18
           });
           prev = { x: e.x, y: e.y };
-          const dmg = Math.round(36 * (1 - idx * 0.22));
+          const dmg = Math.round(38 * (1 - idx * 0.22));
           this.damageEnemy(e, dmg);
         });
       }
@@ -1243,7 +1295,9 @@
 
     onProjectileHit(proj) {
       if (proj.type === 'cannonball') {
-        this.spawnExplosion(proj.targetX, proj.targetY, '#ef4444', 16);
+        // Visible blast explosion
+        this.spawnExplosion(proj.targetX, proj.targetY, '#ef4444', 18);
+        this.spawnExplosion(proj.targetX, proj.targetY, '#fbbf24', 12);
         for (let e of this.enemies) {
           if (!e.flying) {
             const d = Math.hypot(e.x - proj.targetX, e.y - proj.targetY);
@@ -1259,7 +1313,7 @@
           this.damageEnemy(proj.target, proj.damage);
         }
       } else if (proj.type === 'frostbolt') {
-        this.spawnExplosion(proj.x, proj.y, '#38bdf8', 8);
+        this.spawnExplosion(proj.x, proj.y, '#38bdf8', 10);
         if (proj.target && this.enemies.includes(proj.target)) {
           proj.target.slowTimer = proj.slowDuration;
           proj.target.slowFactor = proj.slowFactor;
@@ -1273,10 +1327,10 @@
       enemy.hitFlash = 1;
       this.floatingTexts.push({
         x: enemy.x + (Math.random() - 0.5) * 8,
-        y: enemy.y - 10,
+        y: enemy.y - 12,
         text: `-${dmg}`,
         color: '#f8fafc',
-        vy: -25,
+        vy: -26,
         maxLife: 0.5,
         life: 0.5,
         alpha: 1
@@ -1286,7 +1340,7 @@
         const idx = this.enemies.indexOf(enemy);
         if (idx !== -1) {
           this.enemies.splice(idx, 1);
-          this.spawnExplosion(enemy.x, enemy.y, enemy.color, 14);
+          this.spawnExplosion(enemy.x, enemy.y, enemy.color, 16);
         }
       }
     }
@@ -1294,7 +1348,7 @@
     spawnExplosion(x, y, color, count) {
       for (let i = 0; i < count; i++) {
         const ang = Math.random() * Math.PI * 2;
-        const spd = 20 + Math.random() * 75;
+        const spd = 20 + Math.random() * 80;
         this.particles.push({
           x, y,
           vx: Math.cos(ang) * spd,
@@ -1320,9 +1374,9 @@
 
       // Subtle cinematic camera drift
       const t = performance.now();
-      const camX = Math.sin(t * 0.00035) * 3.5;
-      const camY = Math.cos(t * 0.00028) * 3.0;
-      const camZoom = 1.0 + Math.sin(t * 0.0002) * 0.012;
+      const camX = Math.sin(t * 0.00025) * 4.0;
+      const camY = Math.cos(t * 0.0002) * 3.5;
+      const camZoom = 1.0 + Math.sin(t * 0.00015) * 0.01;
 
       ctx.translate(LOGICAL_WIDTH / 2, LOGICAL_HEIGHT / 2);
       ctx.scale(camZoom, camZoom);
@@ -1332,7 +1386,7 @@
       ctx.fillStyle = '#0f172a';
       ctx.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
-      // Subtle terrain grid texture
+      // Grass terrain texture
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
       ctx.lineWidth = 1;
       for (let x = 0; x <= LOGICAL_WIDTH; x += 30) {
@@ -1342,9 +1396,30 @@
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(LOGICAL_WIDTH, y); ctx.stroke();
       }
 
-      // 2. Winding Stone Enemy Path
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 26;
+      // Decorative trees/shrubs along the countryside
+      const decors = [
+        { x: 30, y: 40, r: 8, c: '#065f46' },
+        { x: 320, y: 80, r: 10, c: '#047857' },
+        { x: 330, y: 200, r: 9, c: '#065f46' },
+        { x: 35, y: 310, r: 11, c: '#047857' },
+        { x: 325, y: 450, r: 9, c: '#065f46' },
+        { x: 30, y: 550, r: 10, c: '#047857' }
+      ];
+      for (let d of decors) {
+        ctx.fillStyle = d.c;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.beginPath();
+        ctx.arc(d.x - 2, d.y - 2, d.r * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2. Long Winding Stone Enemy Path (Cobblestone textured)
+      // Path bed shadow
+      ctx.strokeStyle = '#020617';
+      ctx.lineWidth = 32;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.beginPath();
@@ -1354,26 +1429,40 @@
       }
       ctx.stroke();
 
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 20;
+      // Outer stone border
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 28;
       ctx.stroke();
 
+      // Cobblestone stone slabs
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 22;
+      ctx.stroke();
+
+      // Worn center trail
       ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       ctx.setLineDash([8, 8]);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 3. Enemy Entrance Arch
+      // 3. Top Enemy Entrance Stone Arch
       const ent = this.waypoints[1];
       ctx.save();
-      ctx.translate(ent.x, ent.y - 20);
-      ctx.font = '14px sans-serif';
+      ctx.translate(ent.x, ent.y - 22);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-24, -8, 48, 16);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-24, -8, 48, 16);
+      ctx.fillStyle = '#fef08a';
+      ctx.font = 'bold 9px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🚪 ENTRANCE', 0, 0);
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⚔️ SPAWN GATE', 0, 0);
       ctx.restore();
 
-      // 4. Defensive Towers
+      // 4. Defensive Towers beside the path
       for (let tw of this.towers) {
         ctx.save();
         ctx.translate(tw.x, tw.y);
@@ -1387,34 +1476,123 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Tower Body
-        ctx.fillStyle = tw.color;
-        ctx.beginPath();
-        ctx.arc(0, 0, 13, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Tower Icon
-        ctx.font = '14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(tw.icon, 0, -1);
-
-        // Special Tower Effects
-        if (tw.type === 'lightning') {
-          ctx.strokeStyle = 'rgba(254, 240, 138, 0.6)';
-          ctx.lineWidth = 1.5;
+        if (tw.type === 'archer') {
+          // Archer Tower: Rotating swivel turret and drawn bow
+          ctx.save();
+          ctx.rotate(tw.angle);
+          // Turret wooden platform
+          ctx.fillStyle = '#78350f';
           ctx.beginPath();
-          const spkR = 15 + Math.sin(t * 0.008) * 2;
+          ctx.arc(0, 0, 11, 0, Math.PI * 2);
+          ctx.fill();
+          // Bow
+          const recoilOff = (tw.recoil || 0) * 3;
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(5 - recoilOff, 0, 9, -Math.PI / 2.2, Math.PI / 2.2);
+          ctx.stroke();
+          // Bowstring
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(5 - recoilOff + Math.cos(-Math.PI / 2.2) * 9, Math.sin(-Math.PI / 2.2) * 9);
+          ctx.lineTo(-2 - recoilOff, 0);
+          ctx.lineTo(5 - recoilOff + Math.cos(Math.PI / 2.2) * 9, Math.sin(Math.PI / 2.2) * 9);
+          ctx.stroke();
+          // Arrow on bow
+          ctx.strokeStyle = '#22c55e';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-2 - recoilOff, 0);
+          ctx.lineTo(12 - recoilOff, 0);
+          ctx.stroke();
+          ctx.restore();
+
+          // Pennant
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.arc(0, 0, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+        } else if (tw.type === 'cannon') {
+          // Cannon Tower: Rotating iron barrel with recoil kickback
+          ctx.save();
+          ctx.rotate(tw.angle);
+          const kickback = (tw.recoil || 0) * 5;
+          // Cannon mount
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(-7, -7, 14, 14);
+          // Cannon barrel
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(-2 - kickback, -5, 17, 10);
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(-2 - kickback, -5, 17, 10);
+          // Cannon bore
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(14 - kickback, -4, 2, 8);
+          ctx.restore();
+
+        } else if (tw.type === 'magic') {
+          // Magic Tower: Arcane obelisk and glowing floating crystal orb
+          ctx.fillStyle = '#312e81';
+          ctx.beginPath();
+          ctx.arc(0, 0, 11, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#a855f7';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Glowing floating orb
+          const orbBob = Math.sin(t * 0.005) * 3;
+          ctx.fillStyle = '#38bdf8';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(0, orbBob, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // Orbiting magical sparkle crystals
+          for (let s = 0; s < 3; s++) {
+            const sAng = t * 0.004 + s * ((Math.PI * 2) / 3);
+            const sx = Math.cos(sAng) * 12;
+            const sy = Math.sin(sAng) * 12;
+            ctx.fillStyle = '#c084fc';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+        } else if (tw.type === 'lightning') {
+          // Lightning Tower: Tesla coil with crackling electric sparks
+          ctx.fillStyle = '#451a03';
+          ctx.beginPath();
+          ctx.arc(0, 0, 11, 0, Math.PI * 2);
+          ctx.fill();
+          // Copper coil rings
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, 8, 0, Math.PI * 2);
+          ctx.stroke();
+          // Central conductor sphere
+          ctx.fillStyle = '#fef08a';
+          ctx.shadowColor = '#fbbf24';
+          ctx.shadowBlur = 9;
+          ctx.beginPath();
+          ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // Crackling electric spark rings
+          ctx.strokeStyle = 'rgba(254, 240, 138, 0.7)';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          const spkR = 14 + Math.sin(t * 0.012) * 2;
           ctx.arc(0, 0, spkR, 0, Math.PI * 2);
           ctx.stroke();
-        } else if (tw.type === 'magic') {
-          const orbAng = t * 0.004;
-          const ox = Math.cos(orbAng) * 15;
-          const oy = Math.sin(orbAng) * 15;
-          ctx.fillStyle = '#38bdf8';
-          ctx.beginPath();
-          ctx.arc(ox, oy, 2.5, 0, Math.PI * 2);
-          ctx.fill();
         }
 
         ctx.restore();
@@ -1423,8 +1601,8 @@
       // 5. Lightning Arcs
       for (let arc of this.lightningArcs) {
         ctx.save();
-        ctx.strokeStyle = 'rgba(254, 240, 138, 0.35)';
-        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = 6;
         ctx.beginPath();
         ctx.moveTo(arc.x1, arc.y1);
         ctx.lineTo(arc.x2, arc.y2);
@@ -1447,49 +1625,132 @@
         ctx.save();
         ctx.translate(e.x, e.y);
 
-        // Flying shadow
+        // Ground shadow for flying or ground enemies
         if (e.flying) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
           ctx.beginPath();
-          ctx.ellipse(0, 10, e.radius, e.radius * 0.5, 0, 0, Math.PI * 2);
+          ctx.ellipse(0, 12, e.radius, e.radius * 0.5, 0, 0, Math.PI * 2);
           ctx.fill();
-          ctx.translate(0, -6);
+          ctx.translate(0, -9); // Fly above ground
+        } else {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          ctx.beginPath();
+          ctx.ellipse(0, e.radius * 0.7, e.radius * 0.8, e.radius * 0.4, 0, 0, Math.PI * 2);
+          ctx.fill();
         }
 
-        // Enemy Body
-        ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : e.color;
-        ctx.beginPath();
-        ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#020617';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Icon
-        ctx.font = `${e.radius * 1.2}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(e.icon, 0, 0);
-
-        // Frost tint overlay if slowed
-        if (e.slowTimer > 0) {
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+        // Enemy visual rendering
+        if (e.type === 'basic') {
+          // Goblin Scout: Green skin, pointy ears, small dagger
+          ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : '#10b981';
           ctx.beginPath();
-          ctx.arc(0, 0, e.radius + 2, 0, Math.PI * 2);
+          ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#064e3b';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          // Pointy ears
+          ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : '#059669';
+          ctx.beginPath();
+          ctx.moveTo(-e.radius, -2); ctx.lineTo(-e.radius - 5, -5); ctx.lineTo(-e.radius + 1, 3);
+          ctx.moveTo(e.radius, -2); ctx.lineTo(e.radius + 5, -5); ctx.lineTo(e.radius - 1, 3);
+          ctx.fill();
+          // Face
+          ctx.fillStyle = '#dc2626';
+          ctx.fillRect(-3, -2, 2, 2);
+          ctx.fillRect(2, -2, 2, 2);
+
+        } else if (e.type === 'fast') {
+          // Shadow Imp: Dark violet, demon horns, glowing eyes
+          ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : '#4338ca';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#312e81';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          // Horns
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.moveTo(-4, -e.radius + 1); ctx.lineTo(-6, -e.radius - 4); ctx.lineTo(-2, -e.radius);
+          ctx.moveTo(4, -e.radius + 1); ctx.lineTo(6, -e.radius - 4); ctx.lineTo(2, -e.radius);
+          ctx.fill();
+          // Eyes
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(-3, -2, 2, 2);
+          ctx.fillRect(2, -2, 2, 2);
+
+        } else if (e.type === 'heavy') {
+          // Armored Orc: Bulky grey plate armor, horned visor, steel shield
+          ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : '#64748b';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Iron helmet visor
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(-6, -4, 12, 4);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(-4, -3, 3, 2);
+          ctx.fillRect(1, -3, 3, 2);
+          // Steel shield
+          ctx.fillStyle = '#94a3b8';
+          ctx.beginPath();
+          ctx.arc(7, 3, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+        } else if (e.type === 'flying') {
+          // Winged Harpy: Purple body, flapping winged animation cycle
+          const flap = Math.sin(t * 0.015) * 8;
+          ctx.fillStyle = e.hitFlash > 0 ? '#ffffff' : '#7c3aed';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#4c1d95';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          // Left & Right Flapping Wings
+          ctx.fillStyle = '#a855f7';
+          ctx.beginPath();
+          ctx.moveTo(-e.radius + 2, 0);
+          ctx.lineTo(-e.radius - 10, -5 + flap);
+          ctx.lineTo(-e.radius - 2, 5);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(e.radius - 2, 0);
+          ctx.lineTo(e.radius + 10, -5 + flap);
+          ctx.lineTo(e.radius + 2, 5);
+          ctx.fill();
+          // Eyes
+          ctx.fillStyle = '#f43f5e';
+          ctx.fillRect(-3, -2, 2, 2);
+          ctx.fillRect(2, -2, 2, 2);
+        }
+
+        // Frost Slow Effect: Cyan aura and orbiting crystal snowflakes
+        if (e.slowTimer > 0) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+          ctx.beginPath();
+          ctx.arc(0, 0, e.radius + 3, 0, Math.PI * 2);
           ctx.fill();
 
           ctx.fillStyle = '#bae6fd';
           for (let s = 0; s < 4; s++) {
-            const sAng = (t * 0.004) + s * (Math.PI / 2);
-            ctx.fillRect(Math.cos(sAng) * (e.radius + 3) - 1, Math.sin(sAng) * (e.radius + 3) - 1, 2, 2);
+            const sAng = (t * 0.005) + s * (Math.PI / 2);
+            ctx.fillRect(Math.cos(sAng) * (e.radius + 4) - 1, Math.sin(sAng) * (e.radius + 4) - 1, 2.5, 2.5);
           }
         }
 
         // Health Bar
-        const barW = Math.max(18, e.radius * 2);
+        const barW = Math.max(18, e.radius * 2 + 2);
         const barH = 3;
-        const barY = -e.radius - 5;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        const barY = -e.radius - 6;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(-barW / 2, barY, barW, barH);
         const hpPct = Math.max(0, e.hp / e.maxHp);
         ctx.fillStyle = hpPct > 0.4 ? '#10b981' : '#ef4444';
@@ -1507,21 +1768,21 @@
           ctx.strokeStyle = '#22c55e';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(-6, 0);
-          ctx.lineTo(6, 0);
+          ctx.moveTo(-7, 0);
+          ctx.lineTo(7, 0);
           ctx.stroke();
           // Arrow tip
           ctx.fillStyle = '#fef08a';
           ctx.beginPath();
-          ctx.moveTo(6, 0);
-          ctx.lineTo(2, -3);
-          ctx.lineTo(2, 3);
+          ctx.moveTo(7, 0);
+          ctx.lineTo(3, -3);
+          ctx.lineTo(3, 3);
           ctx.closePath();
           ctx.fill();
         } else if (p.type === 'cannonball') {
           ctx.fillStyle = '#ef4444';
           ctx.beginPath();
-          ctx.arc(0, 0, 5, 0, Math.PI * 2);
+          ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
@@ -1529,9 +1790,12 @@
           ctx.fill();
         } else if (p.type === 'frostbolt') {
           ctx.fillStyle = '#38bdf8';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 6;
           ctx.beginPath();
-          ctx.arc(0, 0, 4, 0, Math.PI * 2);
+          ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
           ctx.fill();
+          ctx.shadowBlur = 0;
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
           ctx.arc(0, 0, 2, 0, Math.PI * 2);
@@ -1546,84 +1810,114 @@
       ctx.save();
       ctx.translate(cX, cY);
 
-      // Castle Hit pulse ring
+      // Castle Hit pulse ring when enemy reaches it
       if (this.castleHitTimer > 0) {
-        const pulseR = 28 + (1 - this.castleHitTimer / 0.45) * 24;
-        ctx.strokeStyle = `rgba(239, 68, 68, ${this.castleHitTimer / 0.45})`;
-        ctx.lineWidth = 3;
+        const pulseR = 30 + (1 - this.castleHitTimer / 0.5) * 30;
+        ctx.strokeStyle = `rgba(239, 68, 68, ${this.castleHitTimer / 0.5})`;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.arc(0, 0, pulseR, 0, Math.PI * 2);
         ctx.stroke();
       }
 
-      // Castle Stone Keep
+      // Castle Stone Keep Main Body
       ctx.fillStyle = this.castleHitTimer > 0 ? '#450a0a' : '#1e293b';
-      ctx.fillRect(-45, -20, 90, 40);
+      ctx.fillRect(-48, -22, 96, 44);
       ctx.strokeStyle = '#f59e0b';
       ctx.lineWidth = 2;
-      ctx.strokeRect(-45, -20, 90, 40);
+      ctx.strokeRect(-48, -22, 96, 44);
 
-      // Crenellations
+      // Crenellations / Battlements
       ctx.fillStyle = '#334155';
-      for (let cx = -45; cx <= 35; cx += 16) {
-        ctx.fillRect(cx, -28, 10, 8);
+      for (let cx = -46; cx <= 36; cx += 16) {
+        ctx.fillRect(cx, -30, 10, 8);
       }
 
       // Central Arched Gate
       ctx.fillStyle = '#020617';
       ctx.beginPath();
-      ctx.arc(0, 10, 14, Math.PI, 0);
-      ctx.rect(-14, 10, 28, 10);
+      ctx.arc(0, 12, 14, Math.PI, 0);
+      ctx.rect(-14, 12, 28, 10);
       ctx.fill();
 
-      // Glowing Warm Windows
+      // Portcullis iron bars
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+      for (let bx = -10; bx <= 10; bx += 5) {
+        ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx, 22); ctx.stroke();
+      }
+
+      // Glowing Warm Amber Windows
       ctx.fillStyle = '#fbbf24';
       ctx.fillRect(-28, -8, 8, 12);
       ctx.fillRect(20, -8, 8, 12);
 
-      // Turrets on Left & Right
+      // Left & Right Watchturrets
       ctx.fillStyle = '#1e293b';
-      ctx.fillRect(-52, -32, 14, 48);
-      ctx.fillRect(38, -32, 14, 48);
-      ctx.strokeRect(-52, -32, 14, 48);
-      ctx.strokeRect(38, -32, 14, 48);
+      ctx.fillRect(-56, -34, 16, 52);
+      ctx.fillRect(40, -34, 16, 52);
+      ctx.strokeRect(-56, -34, 16, 52);
+      ctx.strokeRect(40, -34, 16, 52);
 
-      // Animated Torches on Turrets
+      // Castle Defenders on Turrets (Defensive Activity)
+      // Left Archer
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(-48, -38, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(-48, -38, 6, -Math.PI / 2, Math.PI / 3);
+      ctx.stroke();
+
+      // Right Archer
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(48, -38, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(48, -38, 6, Math.PI * 0.7, Math.PI * 1.5);
+      ctx.stroke();
+
+      // Animated Flickering Torches
       const flameFlicker = Math.sin(t * 0.015) * 2;
       ctx.fillStyle = '#f97316';
       ctx.beginPath();
-      ctx.arc(-45, -36, 4 + flameFlicker * 0.5, 0, Math.PI * 2);
-      ctx.arc(45, -36, 4 - flameFlicker * 0.5, 0, Math.PI * 2);
+      ctx.arc(-48, -45, 4 + flameFlicker * 0.5, 0, Math.PI * 2);
+      ctx.arc(48, -45, 4 - flameFlicker * 0.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#fef08a';
       ctx.beginPath();
-      ctx.arc(-45, -36, 2, 0, Math.PI * 2);
-      ctx.arc(45, -36, 2, 0, Math.PI * 2);
+      ctx.arc(-48, -45, 2, 0, Math.PI * 2);
+      ctx.arc(48, -45, 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Animated Waving Flags
+      // Animated Waving Cloth Flags
       const flagWave = Math.sin(t * 0.006) * 4;
       // Left flag
       ctx.strokeStyle = '#94a3b8';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(-45, -32); ctx.lineTo(-45, -50); ctx.stroke();
+      ctx.moveTo(-48, -34); ctx.lineTo(-48, -55); ctx.stroke();
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.moveTo(-45, -50);
-      ctx.quadraticCurveTo(-33 + flagWave, -45, -25, -44 + flagWave);
-      ctx.lineTo(-45, -38);
+      ctx.moveTo(-48, -55);
+      ctx.quadraticCurveTo(-36 + flagWave, -50, -28, -49 + flagWave);
+      ctx.lineTo(-48, -43);
       ctx.closePath();
       ctx.fill();
 
       // Right flag
       ctx.beginPath();
-      ctx.moveTo(45, -32); ctx.lineTo(45, -50); ctx.stroke();
+      ctx.moveTo(48, -34); ctx.lineTo(48, -55); ctx.stroke();
       ctx.fillStyle = '#3b82f6';
       ctx.beginPath();
-      ctx.moveTo(45, -50);
-      ctx.quadraticCurveTo(57 + flagWave, -45, 65, -44 + flagWave);
-      ctx.lineTo(45, -38);
+      ctx.moveTo(48, -55);
+      ctx.quadraticCurveTo(60 + flagWave, -50, 68, -49 + flagWave);
+      ctx.lineTo(48, -43);
       ctx.closePath();
       ctx.fill();
 
@@ -1646,7 +1940,7 @@
         ctx.restore();
       }
 
-      // 10. Floating Texts
+      // 10. Floating Damage Texts
       for (let ft of this.floatingTexts) {
         ctx.save();
         ctx.globalAlpha = ft.alpha;
@@ -1982,6 +2276,7 @@
       this.sound.init();
       this.isChallengeMode = false;
       this.activeChallenge = null;
+      this.updateTowerCardsAvailability();
       document.getElementById('active-challenge-hud')?.classList.add('hidden');
       document.getElementById('challenge-complete-modal')?.classList.add('hidden');
       document.getElementById('challenge-failed-modal')?.classList.add('hidden');
@@ -2297,6 +2592,24 @@
         this.castleHitTimer -= dt;
       }
 
+      if (this.isChallengeMode && this.activeChallenge) {
+        this.challengeTimeElapsed += dt;
+        if (this.activeChallenge.timeLimit > 0) {
+          const timeLeft = Math.max(0, this.activeChallenge.timeLimit - this.challengeTimeElapsed);
+          const timerEl = document.getElementById('challenge-hud-timer');
+          if (timerEl) {
+            timerEl.classList.remove('hidden');
+            const m = Math.floor(timeLeft / 60);
+            const s = Math.floor(timeLeft % 60);
+            timerEl.textContent = `⏱️ ${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+          }
+          if (timeLeft <= 0) {
+            this.failChallenge(`Time limit of ${this.activeChallenge.timeLimit}s exceeded!`);
+            return;
+          }
+        }
+      }
+
       // Smooth camera interpolation
       this.cameraY += (this.targetCameraY - this.cameraY) * 0.16;
 
@@ -2362,6 +2675,14 @@
           this.castleHealth = Math.max(0, this.castleHealth - dmg);
           this.castleHitTimer = 0.5;
           this.sound.castleDamage();
+
+          if (this.isChallengeMode && this.activeChallenge) {
+            this.challengeCastleDamaged = true;
+            if (this.activeChallenge.type === 'perfect') {
+              this.failChallenge('Castle took damage! (Requirement: No damage taken)');
+              return;
+            }
+          }
 
           // Castle damage visual effects & floating text
           this.addFloatingText(pos.x, pos.y - 12, `-${dmg} 🏰`, '#ef4444');
@@ -2640,6 +2961,18 @@
       if (enemy.isBoss) {
         this.bossesDefeated++;
       }
+
+      if (this.isChallengeMode && this.activeChallenge) {
+        this.challengeKills++;
+        if (enemy.isBoss) {
+          this.challengeBossKills++;
+        }
+        if (tower && tower.type) {
+          this.challengeTowerKills[tower.type] = (this.challengeTowerKills[tower.type] || 0) + 1;
+        }
+        this.checkChallengeConditions();
+      }
+
       this.syncStats();
       this.saveAll();
 
@@ -2783,6 +3116,14 @@
       if (!this.isTileValidForPlacement(col, row)) {
         this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'INVALID LOCATION!', '#ef4444');
         return;
+      }
+
+      if (this.isChallengeMode && this.activeChallenge && this.activeChallenge.allowedTowers) {
+        if (!this.activeChallenge.allowedTowers.includes(typeKey)) {
+          this.sound.buttonClick();
+          this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'RESTRICTED TOWER!', '#ef4444');
+          return;
+        }
       }
 
       const cfg = TOWER_CONFIGS[typeKey];
@@ -3531,7 +3872,48 @@
 
       document.getElementById('btn-challenge')?.addEventListener('click', () => {
         this.sound.buttonClick();
-        this.openChallengesModal();
+        this.openChallengesScreen();
+      });
+
+      // Challenges Screen Navigation & Modals
+      document.getElementById('btn-challenges-back')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.showScreen('main-menu');
+      });
+
+      document.getElementById('btn-claim-challenge-reward')?.addEventListener('click', () => {
+        this.sound.coinCollect();
+        if (this.activeChallenge && !this.activeChallenge.claimed) {
+          this.activeChallenge.claimed = true;
+          this.addMoney(this.activeChallenge.reward);
+          Storage.saveChallenges(this.challenges);
+          this.saveAll();
+          this.renderMenuBadges();
+        }
+        document.getElementById('challenge-complete-modal')?.classList.add('hidden');
+        this.openChallengesScreen();
+      });
+
+      document.getElementById('btn-back-challenges-from-win')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        document.getElementById('challenge-complete-modal')?.classList.add('hidden');
+        this.openChallengesScreen();
+      });
+
+      document.getElementById('btn-retry-challenge')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        document.getElementById('challenge-failed-modal')?.classList.add('hidden');
+        if (this.activeChallenge) {
+          this.startChallenge(this.activeChallenge.id);
+        } else {
+          this.openChallengesScreen();
+        }
+      });
+
+      document.getElementById('btn-back-challenges-from-fail')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        document.getElementById('challenge-failed-modal')?.classList.add('hidden');
+        this.openChallengesScreen();
       });
 
       document.getElementById('btn-settings')?.addEventListener('click', () => {
@@ -4001,54 +4383,357 @@
       document.getElementById('tasks-modal')?.classList.remove('hidden');
     }
 
-    openChallengesModal() {
+    openChallengesScreen() {
       this.menuBattle?.pause();
       this.syncStats();
-      const list = document.getElementById('challenges-list');
-      if (!list) return;
-      list.innerHTML = '';
 
-      const claimedCount = this.challenges.filter(c => c.claimed).length;
-      const titleEl = document.getElementById('challenges-title');
-      if (titleEl) titleEl.textContent = `CHALLENGES ${claimedCount} / 100`;
+      const moneyEl = document.getElementById('challenges-money-val');
+      if (moneyEl) moneyEl.textContent = `Rs ${this.money}`;
 
-      this.challenges.forEach(ch => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        const pct = Math.min(100, Math.round((ch.current / ch.target) * 100));
-        const canClaim = !ch.claimed && ch.current >= ch.target;
+      const completedCount = this.challenges.filter(c => c.completed).length;
+      const countEl = document.getElementById('challenges-count-badge');
+      if (countEl) countEl.textContent = `Completed: ${completedCount} / 100`;
 
-        card.innerHTML = `
-          <div class="item-header">
-            <span class="item-title">${ch.name}</span>
-            <span class="item-reward">+Rs ${ch.reward}</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width: ${pct}%"></div>
-          </div>
-          <div class="item-footer">
-            <span class="progress-text">${ch.desc} (${ch.current}/${ch.target})</span>
-            <button class="btn-claim" ${ch.claimed ? 'disabled' : (canClaim ? '' : 'disabled')}>
-              ${ch.claimed ? 'CLAIMED' : 'CLAIM'}
-            </button>
-          </div>
-        `;
-
-        const claimBtn = card.querySelector('.btn-claim');
-        if (canClaim) {
-          claimBtn.addEventListener('click', () => {
-            this.sound.coinCollect();
-            ch.claimed = true;
-            this.addMoney(ch.reward);
-            this.saveAll();
-            this.renderMenuBadges();
-            this.openChallengesModal();
-          });
-        }
-        list.appendChild(card);
+      // Update unlock status for all challenges
+      this.challenges.forEach(c => {
+        c.unlocked = (c.id <= 5) || c.completed || (completedCount >= (c.reqCompleted || 0));
       });
 
-      document.getElementById('challenges-modal')?.classList.remove('hidden');
+      const list = document.getElementById('challenges-grid-list');
+      if (list) {
+        list.innerHTML = '';
+        this.challenges.forEach(ch => {
+          const card = document.createElement('div');
+          const isCompleted = !!ch.completed;
+          const isClaimed = !!ch.claimed;
+          const isUnlocked = !!ch.unlocked;
+
+          let cardClass = 'challenge-card';
+          if (isCompleted) cardClass += ' completed';
+          else if (!isUnlocked) cardClass += ' locked';
+
+          let statusBadgeClass = 'ch-card-status-badge';
+          let statusText = 'LOCKED';
+          if (isCompleted) {
+            if (isClaimed) {
+              statusBadgeClass += ' status-completed';
+              statusText = 'COMPLETED';
+            } else {
+              statusBadgeClass += ' status-claimable';
+              statusText = 'CLAIM REWARD';
+            }
+          } else if (isUnlocked) {
+            statusBadgeClass += ' status-claimable';
+            statusText = 'AVAILABLE';
+          } else {
+            statusBadgeClass += ' status-locked';
+            statusText = `REQ: ${ch.reqCompleted} CLEARED`;
+          }
+
+          let actionBtnHtml = '';
+          if (isCompleted && !isClaimed) {
+            actionBtnHtml = `<button class="btn-challenge-claim-card" data-claim-id="${ch.id}">CLAIM +Rs ${ch.reward}</button>`;
+          } else {
+            const btnLabel = isCompleted ? 'REPLAY' : 'PLAY';
+            actionBtnHtml = `<button class="btn-challenge-play" data-play-id="${ch.id}" ${isUnlocked ? '' : 'disabled'}>${btnLabel}</button>`;
+          }
+
+          card.className = cardClass;
+          card.innerHTML = `
+            <div class="ch-card-header">
+              <span class="ch-card-num">${ch.numStr || ('Challenge ' + (ch.id < 10 ? '0' + ch.id : ch.id))}</span>
+              <span class="${statusBadgeClass}">${statusText}</span>
+            </div>
+            <div class="ch-card-title">${ch.title}</div>
+            <div class="ch-card-desc">${ch.desc}</div>
+            <div class="ch-card-bottom">
+              <span class="ch-card-reward">+Rs ${ch.reward}</span>
+              ${actionBtnHtml}
+            </div>
+          `;
+
+          const claimBtn = card.querySelector(`[data-claim-id="${ch.id}"]`);
+          if (claimBtn) {
+            claimBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.sound.coinCollect();
+              ch.claimed = true;
+              this.addMoney(ch.reward);
+              Storage.saveChallenges(this.challenges);
+              this.saveAll();
+              this.renderMenuBadges();
+              this.openChallengesScreen();
+            });
+          }
+
+          const playBtn = card.querySelector(`[data-play-id="${ch.id}"]`);
+          if (playBtn && isUnlocked) {
+            playBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.sound.buttonClick();
+              this.startChallenge(ch.id);
+            });
+          }
+
+          list.appendChild(card);
+        });
+      }
+
+      this.showScreen('challenges-screen');
+    }
+
+    startChallenge(challengeId) {
+      const ch = this.challenges.find(c => c.id === challengeId);
+      if (!ch || !ch.unlocked) return;
+
+      this.sound.init();
+      this.isChallengeMode = true;
+      this.activeChallenge = ch;
+
+      this.challengeKills = 0;
+      this.challengeWavesCompleted = 0;
+      this.challengeBossKills = 0;
+      this.challengeTowerKills = { archer: 0, cannon: 0, magic: 0, lightning: 0 };
+      this.challengeCastleDamaged = false;
+      this.challengeStartTime = Date.now();
+      this.challengeTimeElapsed = 0;
+      this.challengeTimeLimit = ch.timeLimit || 0;
+
+      // Close all modals
+      document.getElementById('challenge-complete-modal')?.classList.add('hidden');
+      document.getElementById('challenge-failed-modal')?.classList.add('hidden');
+      document.getElementById('challenges-modal')?.classList.add('hidden');
+      document.getElementById('pause-modal')?.classList.add('hidden');
+
+      // Money setup for challenge
+      const sMoney = ch.startMoney !== undefined ? ch.startMoney : 450;
+      if (ch.type === 'budget') {
+        this.money = sMoney;
+      } else {
+        this.money = Math.max(this.money, sMoney);
+      }
+
+      this.isPlaying = true;
+      this.castleHealth = 100;
+      this.maxCastleHealth = 100;
+      this.castleHitTimer = 0;
+      this.wave = 1;
+      this.isPaused = false;
+      this.gameSpeed = 1;
+      this.prepTimer = 6;
+      this.isWaveActive = false;
+      this.sessionStartTime = Date.now();
+      this.sessionDurationSec = 0;
+      this.matchKills = 0;
+      this.matchMoneyCollected = 0;
+
+      this.towers = [];
+      this.enemies = [];
+      this.projectiles = [];
+      this.particles = [];
+      this.floatingTexts = [];
+      this.lightningArcs = [];
+
+      this.selectedTile = null;
+      this.selectedTower = null;
+      this.selectedBuildType = null;
+      this.hoverTile = null;
+      this.cameraY = 0;
+      this.targetCameraY = 0;
+      document.getElementById('tile-selection-hint')?.classList.add('hidden');
+      document.querySelectorAll('.tower-card').forEach(c => c.classList.remove('selected'));
+      this.closeInspector();
+
+      this.updateTowerCardsAvailability();
+      this.updateHud();
+      this.updateChallengeProgressUI();
+      this.showScreen('gameplay-screen');
+      this.showWaveBanner(ch.numStr || 'CHALLENGE', ch.title);
+      this.sound.startMusic();
+    }
+
+    getChallengeCurrentValue() {
+      if (!this.activeChallenge) return 0;
+      const ch = this.activeChallenge;
+      switch (ch.type) {
+        case 'waves':
+        case 'perfect':
+        case 'timed':
+        case 'archer_only':
+        case 'cannon_only':
+        case 'magic_only':
+        case 'lightning_only':
+        case 'budget':
+          return this.challengeWavesCompleted;
+        case 'kills':
+          return this.challengeKills;
+        case 'boss':
+          return this.challengeBossKills;
+        case 'archer_kills':
+          return this.challengeTowerKills['archer'] || 0;
+        case 'cannon_kills':
+          return this.challengeTowerKills['cannon'] || 0;
+        case 'magic_kills':
+          return this.challengeTowerKills['magic'] || 0;
+        case 'lightning_kills':
+          return this.challengeTowerKills['lightning'] || 0;
+        default:
+          return this.challengeWavesCompleted;
+      }
+    }
+
+    getChallengeProgressString() {
+      if (!this.activeChallenge) return '';
+      const current = this.getChallengeCurrentValue();
+      const target = this.activeChallenge.target;
+      const ch = this.activeChallenge;
+      if (['waves', 'perfect', 'timed', 'archer_only', 'cannon_only', 'magic_only', 'lightning_only', 'budget'].includes(ch.type)) {
+        return `Waves: ${current} / ${target}`;
+      } else if (ch.type === 'boss') {
+        return `Bosses: ${current} / ${target}`;
+      } else {
+        return `Kills: ${current} / ${target}`;
+      }
+    }
+
+    updateChallengeProgressUI() {
+      if (!this.isChallengeMode || !this.activeChallenge) {
+        document.getElementById('active-challenge-hud')?.classList.add('hidden');
+        return;
+      }
+      const hud = document.getElementById('active-challenge-hud');
+      if (hud) hud.classList.remove('hidden');
+
+      const titleEl = document.getElementById('challenge-hud-name');
+      const descEl = document.getElementById('challenge-hud-desc');
+      if (titleEl) {
+        titleEl.textContent = `${this.activeChallenge.numStr}: ${this.activeChallenge.title}`;
+      }
+      if (descEl) {
+        descEl.textContent = this.getChallengeProgressString();
+      }
+    }
+
+    checkChallengeConditions() {
+      if (!this.isChallengeMode || !this.activeChallenge) return;
+      const ch = this.activeChallenge;
+
+      if (ch.type === 'perfect' && this.challengeCastleDamaged) {
+        this.failChallenge('Castle took damage! (Requirement: No damage taken)');
+        return;
+      }
+
+      const current = this.getChallengeCurrentValue();
+      ch.progress = Math.max(ch.progress || 0, current);
+
+      this.updateChallengeProgressUI();
+
+      if (current >= ch.target) {
+        if (ch.type === 'timed' && ch.timeLimit > 0 && this.challengeTimeElapsed > ch.timeLimit) {
+          this.failChallenge(`Time limit of ${ch.timeLimit}s exceeded!`);
+          return;
+        }
+        if (ch.type === 'perfect' && this.challengeCastleDamaged) {
+          this.failChallenge('Castle took damage! (Requirement: No damage taken)');
+          return;
+        }
+        this.completeChallenge();
+      }
+    }
+
+    completeChallenge() {
+      this.isPlaying = false;
+      this.sound.stopMusic();
+      this.sound.victorySound();
+
+      const ch = this.activeChallenge;
+      if (!ch) return;
+
+      ch.completed = true;
+      ch.progress = ch.target;
+
+      const completedCount = this.challenges.filter(c => c.completed).length;
+      this.challenges.forEach(c => {
+        if (c.id <= 5 || c.completed || completedCount >= (c.reqCompleted || 0)) {
+          c.unlocked = true;
+        }
+      });
+
+      Storage.saveChallenges(this.challenges);
+      this.saveAll();
+      this.renderMenuBadges();
+
+      const modal = document.getElementById('challenge-complete-modal');
+      const nameEl = document.getElementById('comp-ch-name');
+      const rewardEl = document.getElementById('comp-ch-reward');
+      const claimBtn = document.getElementById('btn-claim-challenge-reward');
+      const backBtn = document.getElementById('btn-back-challenges-from-win');
+
+      if (nameEl) {
+        nameEl.textContent = `${ch.numStr}: ${ch.title}`;
+      }
+      if (rewardEl) {
+        rewardEl.textContent = `+Rs ${ch.reward}`;
+      }
+      if (claimBtn && backBtn) {
+        if (ch.claimed) {
+          claimBtn.classList.add('hidden');
+          backBtn.classList.remove('hidden');
+        } else {
+          claimBtn.classList.remove('hidden');
+          backBtn.classList.add('hidden');
+        }
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    failChallenge(reason = '') {
+      this.isPlaying = false;
+      this.sound.stopMusic();
+      this.sound.gameOverSound();
+
+      const modal = document.getElementById('challenge-failed-modal');
+      const nameEl = document.getElementById('fail-ch-name');
+      const killsEl = document.getElementById('fail-ch-kills');
+      const durEl = document.getElementById('fail-ch-duration');
+
+      if (nameEl && this.activeChallenge) {
+        nameEl.textContent = `${this.activeChallenge.numStr}: ${this.activeChallenge.title}`;
+      }
+      if (killsEl) {
+        killsEl.textContent = this.challengeKills.toString();
+      }
+      if (durEl) {
+        durEl.textContent = this.formatDuration(this.challengeTimeElapsed);
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    updateTowerCardsAvailability() {
+      document.querySelectorAll('.tower-card').forEach(card => {
+        const type = card.getAttribute('data-type');
+        if (this.isChallengeMode && this.activeChallenge && this.activeChallenge.allowedTowers) {
+          if (!this.activeChallenge.allowedTowers.includes(type)) {
+            card.classList.add('card-disabled');
+            card.style.opacity = '0.35';
+            card.style.pointerEvents = 'none';
+          } else {
+            card.classList.remove('card-disabled');
+            card.style.opacity = '1';
+            card.style.pointerEvents = 'auto';
+          }
+        } else {
+          card.classList.remove('card-disabled');
+          card.style.opacity = '1';
+          card.style.pointerEvents = 'auto';
+        }
+      });
+    }
+
+    openChallengesModal() {
+      this.openChallengesScreen();
     }
 
     openSettingsModal() {
@@ -4093,8 +4778,13 @@
   window.addEventListener('resize', resizeGame);
   window.addEventListener('orientationchange', resizeGame);
 
-  window.addEventListener('DOMContentLoaded', () => {
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeGame();
+      resizeGame();
+    });
+  } else {
     initializeGame();
     resizeGame();
-  });
+  }
 })();

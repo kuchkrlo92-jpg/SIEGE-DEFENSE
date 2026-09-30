@@ -80,6 +80,26 @@
       </div>
     </div>
 
+    <!-- DEDICATED CHALLENGES SCREEN -->
+    <div id="challenges-screen" class="screen">
+      <div class="challenges-screen-header">
+        <button id="btn-challenges-back" class="btn-back-nav">← BACK</button>
+        <div class="challenges-title-box">
+          <h1 class="challenges-main-title">CHALLENGES</h1>
+          <div id="challenges-count-badge" class="challenges-count-badge">Completed: 0 / 100</div>
+        </div>
+        <div class="challenges-currency-badge">
+          <span>💰</span>
+          <span id="challenges-money-val">Rs 0</span>
+        </div>
+      </div>
+      <div class="challenges-scroll-container">
+        <div id="challenges-grid-list" class="challenges-cards-list">
+          <!-- 100 Challenge Cards dynamically rendered here -->
+        </div>
+      </div>
+    </div>
+
     <!-- GAMEPLAY SCREEN -->
     <div id="gameplay-screen" class="screen">
       <!-- Game Top HUD -->
@@ -100,6 +120,18 @@
           <button id="btn-speed" class="hud-btn" title="Toggle Speed">1x</button>
           <button id="btn-pause" class="hud-btn" title="Pause Game">⏸️</button>
           <button id="btn-ingame-menu" class="hud-btn" title="Return to Menu">🚪</button>
+        </div>
+      </div>
+
+      <!-- Challenge Active In-Game HUD Panel -->
+      <div id="active-challenge-hud" class="active-challenge-hud hidden">
+        <div class="challenge-hud-row">
+          <span class="challenge-hud-badge">🎯 CHALLENGE</span>
+          <span id="challenge-hud-name" class="challenge-hud-title">SURVIVE 5 WAVES</span>
+        </div>
+        <div class="challenge-hud-progress-row">
+          <span id="challenge-hud-desc" class="challenge-hud-desc">Progress: 0 / 5</span>
+          <span id="challenge-hud-timer" class="challenge-hud-timer hidden">⏱️ 02:00</span>
         </div>
       </div>
 
@@ -491,6 +523,46 @@
         <div class="pause-actions">
           <button id="btn-resume" class="btn-primary full-width">RESUME</button>
           <button id="btn-pause-menu" class="btn-secondary full-width">EXIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGE COMPLETE MODAL -->
+    <div id="challenge-complete-modal" class="modal-overlay hidden">
+      <div class="modal-card challenge-result-card victory-card">
+        <div class="result-trophy">🏆</div>
+        <h1 class="result-title complete-title">CHALLENGE COMPLETE!</h1>
+        <div id="comp-ch-name" class="result-subtitle">Challenge: Survive 5 Waves</div>
+        <div class="result-reward-box">
+          <span class="reward-lbl">Reward:</span>
+          <span id="comp-ch-reward" class="reward-val">+Rs 100</span>
+        </div>
+        <div class="result-actions">
+          <button id="btn-claim-challenge-reward" class="btn-primary full-width">CLAIM REWARD</button>
+          <button id="btn-back-challenges-from-win" class="btn-secondary full-width hidden">BACK TO CHALLENGES</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGE FAILED MODAL -->
+    <div id="challenge-failed-modal" class="modal-overlay hidden">
+      <div class="modal-card challenge-result-card defeat-card">
+        <div class="result-trophy">💀</div>
+        <h1 class="result-title failed-title">CHALLENGE FAILED</h1>
+        <div id="fail-ch-name" class="result-subtitle">Challenge: Survive 5 Waves</div>
+        <div class="result-stats-box">
+          <div class="res-stat-item">
+            <span class="res-stat-lbl">Kills:</span>
+            <span id="fail-ch-kills" class="res-stat-val">0</span>
+          </div>
+          <div class="res-stat-item">
+            <span class="res-stat-lbl">Playing Duration:</span>
+            <span id="fail-ch-duration" class="res-stat-val">00:00</span>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="btn-retry-challenge" class="btn-primary full-width">RETRY</button>
+          <button id="btn-back-challenges-from-fail" class="btn-secondary full-width">BACK TO CHALLENGES</button>
         </div>
       </div>
     </div>
