@@ -61,29 +61,6 @@ body {
   }
 }
 
-.btn-fullscreen-toggle {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 100;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid var(--border-gold);
-  color: #fbbf24;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 5px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
-}
-
-.btn-fullscreen-toggle:hover {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fef08a;
-}
-
 .error-overlay {
   position: absolute;
   top: 0;
@@ -1508,6 +1485,35 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.pause-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.pause-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #1e293b;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.pause-stats p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.pause-stats span {
+  color: #fbbf24;
+  font-weight: 800;
 }
 
 /* ================= EXIT SCREEN ================= */

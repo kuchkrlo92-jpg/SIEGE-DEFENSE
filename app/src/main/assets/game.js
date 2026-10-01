@@ -86,16 +86,25 @@
       } catch (e) {}
     }
 
-    // --- SOUND EFFECTS ---
-    arrowShoot() { this.playTone(650, 'triangle', 0.1, 0.12, 350); }
-    cannonShoot() {
-      this.playTone(130, 'sawtooth', 0.35, 0.25, 40);
-      this.playNoise(0.28, 0.25);
+    // --- UNIQUE TOWER SOUND EFFECTS ---
+    arrowShoot() {
+      // Archer: Crisp bow release twang dropping frequency rapidly
+      this.playTone(680, 'triangle', 0.09, 0.16, 280);
     }
-    magicShoot() { this.playTone(480, 'sine', 0.2, 0.15, 780); }
+    cannonShoot() {
+      // Cannon: Deep explosive blast thud and noise burst
+      this.playTone(110, 'sawtooth', 0.35, 0.32, 28);
+      this.playNoise(0.26, 0.28);
+    }
+    magicShoot() {
+      // Magic: Mystical crystalline frost sweep with sparkling harmonic chime
+      this.playTone(460, 'sine', 0.19, 0.18, 880);
+      setTimeout(() => this.playTone(690, 'triangle', 0.14, 0.12, 1150), 35);
+    }
     lightningShoot() {
-      this.playTone(850, 'square', 0.18, 0.15, 120);
-      this.playNoise(0.12, 0.15);
+      // Lightning: High-voltage crackling electric discharge zap
+      this.playTone(980, 'square', 0.15, 0.22, 90);
+      this.playNoise(0.12, 0.24);
     }
     enemyHit() { this.playTone(280, 'sine', 0.08, 0.1, 150); }
     enemyDeath() { this.playTone(180, 'triangle', 0.2, 0.15, 60); }
@@ -2457,16 +2466,20 @@
 
       // Generate Enemy Queue for this wave
       this.spawnQueue = [];
-      const wave = this.wave;
-      const count = Math.min(45, 6 + Math.floor(wave * 0.4) + Math.floor(wave / 5) * 2);
-      const hpMultiplier = (1 + (wave - 1) * 0.16) * diffCfg.enemyHpMultiplier;
-      const spdMultiplier = Math.min(1.35, 1 + (wave - 1) * 0.015) * diffCfg.enemySpeedMultiplier;
+      const currentWave = this.wave;
+      // ENEMY HEALTH RULE:
+      // Wave 1 -> 1, Wave 2 -> 2, Wave 3 -> 3, Wave 4 -> 4, Wave 5+ -> 4
+      // Increases by exactly +1 at the start of each new wave until 4. Maximum is 4. Never above 4.
+      const enemyHealth = Math.min(currentWave, 4);
+
+      const count = Math.min(45, 6 + Math.floor(currentWave * 0.4) + Math.floor(currentWave / 5) * 2);
+      const spdMultiplier = Math.min(1.35, 1 + (currentWave - 1) * 0.015) * diffCfg.enemySpeedMultiplier;
 
       for (let i = 0; i < count; i++) {
         let typeKey = 'basic';
-        if (wave >= 2 && i % 4 === 1) typeKey = 'fast';
-        if (wave >= 3 && i % 5 === 2) typeKey = 'flying';
-        if (wave >= 4 && i % 6 === 3) typeKey = 'heavy';
+        if (currentWave >= 2 && i % 4 === 1) typeKey = 'fast';
+        if (currentWave >= 3 && i % 5 === 2) typeKey = 'flying';
+        if (currentWave >= 4 && i % 6 === 3) typeKey = 'heavy';
 
         // Every 5th wave contains a Void Behemoth boss (or Void Behemoth Supreme on Wave 100)
         if (isBossWave && i === count - 1) {
@@ -2474,9 +2487,8 @@
         }
 
         const cfg = ENEMY_TYPES[typeKey];
-        const bossHpBonus = isFinalWave ? 4.5 : (typeKey === 'boss' ? 1.5 : 1.0);
-        const calcHp = Math.round(cfg.baseHp * hpMultiplier * bossHpBonus);
-        const castleDmg = Math.max(1, Math.round(cfg.baseCastleDamage * diffCfg.enemyCastleDamageMultiplier));
+        const calcHp = enemyHealth;
+        const castleDmg = 1;
 
         this.spawnQueue.push({
           type: typeKey,
@@ -2485,7 +2497,7 @@
           maxHp: calcHp,
           speed: cfg.speed * spdMultiplier,
           castleDamage: castleDmg,
-          reward: Math.round(cfg.reward * (1 + wave * 0.06)),
+          reward: Math.round(cfg.reward * (1 + currentWave * 0.06)),
           color: cfg.color,
           icon: cfg.icon,
           radius: cfg.radius,
@@ -2688,11 +2700,11 @@
         e.y = pos.y;
         e.angle = pos.angle;
 
-        // Reached Castle Base
+        // Reached Castle Base: Castle loses exactly 1 health per enemy
         if (e.distance >= TOTAL_PATH_LENGTH) {
           this.enemies.splice(i, 1);
-          const dmg = Math.max(1, Math.round(e.castleDamage || 5));
-          this.castleHealth = Math.max(0, this.castleHealth - dmg);
+          const dmg = 1;
+          this.castleHealth = Math.max(0, this.castleHealth - 1);
           this.castleHitTimer = 0.5;
           this.sound.castleDamage();
 
@@ -2704,8 +2716,8 @@
             }
           }
 
-          // Castle damage visual effects & floating text
-          this.addFloatingText(pos.x, pos.y - 12, `-${dmg} 🏰`, '#ef4444');
+          // Castle damage visual effects & floating text (-1)
+          this.addFloatingText(pos.x, pos.y - 12, `-1 🏰`, '#ef4444');
           for (let k = 0; k < 12; k++) {
             const ang = Math.random() * Math.PI * 2;
             const spd = 30 + Math.random() * 70;
@@ -4040,18 +4052,14 @@
 
       document.getElementById('btn-pause')?.addEventListener('click', () => {
         this.sound.buttonClick();
-        this.isPaused = !this.isPaused;
+        this.isPaused = true;
         const pModal = document.getElementById('pause-modal');
         if (pModal) {
-          pModal.classList.toggle('hidden', !this.isPaused);
+          pModal.classList.remove('hidden');
           const pw = document.getElementById('pause-wave-num');
           const pd = document.getElementById('pause-duration');
-          const pExitBtn = document.getElementById('btn-pause-menu');
           if (pw) pw.textContent = this.wave.toString();
           if (pd) pd.textContent = this.formatDuration(this.sessionDurationSec);
-          if (pExitBtn) {
-            pExitBtn.textContent = this.isChallengeMode ? 'EXIT CHALLENGE' : 'EXIT TO MENU';
-          }
         }
       });
 
@@ -4061,15 +4069,26 @@
         document.getElementById('pause-modal')?.classList.add('hidden');
       });
 
+      document.getElementById('btn-pause-restart')?.addEventListener('click', () => {
+        this.sound.buttonClick();
+        this.isPaused = false;
+        document.getElementById('pause-modal')?.classList.add('hidden');
+        if (this.isChallengeMode && this.activeChallenge) {
+          this.startChallenge(this.activeChallenge.id);
+        } else {
+          this.startMatch();
+        }
+      });
+
       document.getElementById('btn-pause-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
+        this.isPaused = false;
+        document.getElementById('pause-modal')?.classList.add('hidden');
         if (this.isChallengeMode) {
           this.exitCurrentChallenge();
         } else {
-          this.isPaused = false;
           this.isPlaying = false;
           this.sound.stopMusic();
-          document.getElementById('pause-modal')?.classList.add('hidden');
           this.showScreen('main-menu');
         }
       });
