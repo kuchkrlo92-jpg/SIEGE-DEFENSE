@@ -108,6 +108,13 @@ fun TowerDefenseGameView(modifier: Modifier = Modifier) {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
           }
 
+          addJavascriptInterface(object {
+            @android.webkit.JavascriptInterface
+            fun closeApp() {
+              (context as? android.app.Activity)?.finishAffinity()
+            }
+          }, "AndroidBridge")
+
           webViewClient = object : WebViewClient() {
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
               super.onReceivedError(view, request, error)

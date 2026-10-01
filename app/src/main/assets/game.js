@@ -478,26 +478,136 @@
 
   // --- PERSISTENCE & STORAGE ---
   const Storage = {
+    _cache: null,
+
+    // Safe localStorage wrapper
+    _getItem(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        return null;
+      }
+    },
+    _setItem(key, val) {
+      try {
+        localStorage.setItem(key, val);
+      } catch (e) {}
+    },
+    _removeItem(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {}
+    },
+
+    init() {
+      try {
+        return this.load();
+      } catch (e) {
+        return this.createDefaultData();
+      }
+    },
+
+    createDefaultData() {
+      // First-time player defaults:
+      // Player Name: Your Player, Money: Rs 0, Difficulty: Easy, Master Volume: 70%, Graphics: Medium, Castle Health: 100, Wave: 1
+      const initialData = {
+        playerName: "Your Player",
+        playerPicture: "",
+        money: 0,
+        tasks: generate100Tasks(),
+        challenges: generate100Challenges(),
+        settings: {
+          music: true,
+          sfx: true,
+          quality: "medium",
+          difficulty: "easy",
+          masterVolume: 0.70
+        },
+        difficulty: "easy",
+        masterVolume: 0.70,
+        graphicsQuality: "medium",
+        castleHealth: 100,
+        wave: 1,
+        totalKills: 0,
+        highestWave: 0,
+        totalPlayingTime: 0,
+        towersBuilt: 0,
+        towersUpgraded: 0,
+        bossesDefeated: 0,
+        totalMoneyEarned: 0,
+        perfectWavesCount: 0,
+        speedWavesCount: 0
+      };
+      this.save(initialData);
+      return initialData;
+    },
+
     load() {
       try {
-        const raw = localStorage.getItem('vtd_save_data');
+        const raw = this._getItem('vtd_save_data');
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed && typeof parsed === 'object') {
-            // Guarantee exactly 100 tasks and 100 challenges
-            if (!parsed.tasks || parsed.tasks.length < 100) {
+            // Player Name: preserve existing save data, migrate if dedicated key exists
+            const savedName = this._getItem('vtd_player_name');
+            if (savedName && savedName.trim()) {
+              parsed.playerName = savedName.trim();
+            } else if (!parsed.playerName || !parsed.playerName.trim()) {
+              parsed.playerName = "Your Player";
+            }
+
+            // Player Picture
+            const savedPic = this._getItem('vtd_player_avatar');
+            if (savedPic) {
+              parsed.playerPicture = savedPic;
+            } else if (!parsed.playerPicture) {
+              parsed.playerPicture = "";
+            }
+
+            // Money (Default: Rs 0)
+            const savedMoney = this._getItem('vtd_money');
+            if (savedMoney !== null && !isNaN(parseInt(savedMoney, 10))) {
+              parsed.money = parseInt(savedMoney, 10);
+            } else if (typeof parsed.money !== 'number' || isNaN(parsed.money)) {
+              parsed.money = 0;
+            }
+
+            // Settings & Difficulty & Graphics & Master Volume
+            if (!parsed.settings) parsed.settings = {};
+            const savedDiff = this._getItem('vtd_difficulty');
+            parsed.settings.difficulty = savedDiff || parsed.settings.difficulty || parsed.difficulty || 'easy';
+            parsed.difficulty = parsed.settings.difficulty;
+
+            const savedQual = this._getItem('vtd_graphics_quality');
+            parsed.settings.quality = savedQual || parsed.settings.quality || parsed.graphicsQuality || 'medium';
+            parsed.graphicsQuality = parsed.settings.quality;
+
+            const savedVol = this._getItem('vtd_master_volume');
+            if (savedVol !== null && !isNaN(parseFloat(savedVol))) {
+              parsed.settings.masterVolume = parseFloat(savedVol);
+            } else if (typeof parsed.settings.masterVolume !== 'number') {
+              parsed.settings.masterVolume = 0.70;
+            }
+            parsed.masterVolume = parsed.settings.masterVolume;
+
+            if (typeof parsed.castleHealth !== 'number') parsed.castleHealth = 100;
+            if (typeof parsed.wave !== 'number') parsed.wave = 1;
+
+            // Guarantee exactly 100 tasks
+            if (!parsed.tasks || !Array.isArray(parsed.tasks) || parsed.tasks.length < 100) {
               const fresh = generate100Tasks();
               const oldMap = new Map((parsed.tasks || []).map(t => [t.id, t]));
               parsed.tasks = fresh.map(f => {
                 const old = oldMap.get(f.id);
-                return old ? { ...f, current: old.current, claimed: old.claimed } : f;
+                return old ? { ...f, current: old.current || 0, claimed: !!old.claimed } : f;
               });
             }
-            // Handle 100 Playable Challenges
+
+            // Guarantee exactly 100 challenges
             const freshChs = generate100Challenges();
             let savedChList = [];
             try {
-              const chRaw = localStorage.getItem('vtd_challenges_data');
+              const chRaw = this._getItem('vtd_challenges_data');
               if (chRaw) savedChList = JSON.parse(chRaw);
             } catch (e) {}
             if (!savedChList || savedChList.length === 0) {
@@ -513,58 +623,239 @@
                 if (s) {
                   c.completed = !!s.completed;
                   c.claimed = !!s.claimed;
-                  c.progress = typeof s.progress === 'number' ? s.progress : 0;
+                  c.progress = typeof s.progress === 'number' ? s.progress : (typeof s.current === 'number' ? s.current : 0);
                 }
                 c.unlocked = (c.id <= 5) || c.completed || (completedCount >= (c.reqCompleted || 0));
               });
             }
             parsed.challenges = freshChs;
-            if (!parsed.settings) parsed.settings = {};
-            if (!parsed.settings.difficulty) {
-              parsed.settings.difficulty = localStorage.getItem('vtd_difficulty') || 'easy';
-            }
-            if (!parsed.settings.quality) {
-              parsed.settings.quality = localStorage.getItem('vtd_graphics_quality') || 'medium';
-            }
-            // Ensure valid money number
-            if (typeof parsed.money !== 'number') parsed.money = 0;
+
+            this._cache = parsed;
             return parsed;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Storage load failed, creating clean defaults', e);
+      }
 
-      // Initial First-Time Save: STARTING MONEY MUST BE EXACTLY Rs 0
-      const initialData = {
-        playerName: "Your Player",
-        playerPicture: "",
-        money: 0,
-        tasks: generate100Tasks(),
-        challenges: generate100Challenges(),
-        settings: {
-          music: true,
-          sfx: true,
-          quality: localStorage.getItem('vtd_graphics_quality') || "medium",
-          difficulty: localStorage.getItem('vtd_difficulty') || "easy"
-        },
-        totalKills: 0,
-        highestWave: 0,
-        totalPlayingTime: 0,
-        towersBuilt: 0,
-        towersUpgraded: 0,
-        bossesDefeated: 0,
-        totalMoneyEarned: 0,
-        perfectWavesCount: 0,
-        speedWavesCount: 0
-      };
-      this.save(initialData);
-      return initialData;
+      return this.createDefaultData();
     },
+
     save(data) {
+      if (!data || typeof data !== 'object') return;
+      this._cache = data;
       try {
-        localStorage.setItem('vtd_save_data', JSON.stringify(data));
+        this._setItem('vtd_save_data', JSON.stringify(data));
       } catch (e) {}
     },
+
+    // --- PLAYER NAME ---
+    setPlayerName(name) {
+      const validName = (typeof name === 'string' && name.trim()) ? name.trim().slice(0, 20) : "Your Player";
+      this._setItem('vtd_player_name', validName);
+      try {
+        const data = this._cache || this.load();
+        data.playerName = validName;
+        this.save(data);
+      } catch (e) {}
+      // Update DOM immediately
+      const menuEl = document.getElementById('menu-player-name');
+      if (menuEl) menuEl.textContent = validName;
+      if (window.activeGame) window.activeGame.playerName = validName;
+      return validName;
+    },
+    getPlayerName() {
+      const direct = this._getItem('vtd_player_name');
+      if (direct && direct.trim()) return direct.trim();
+      const data = this._cache || this.load();
+      return (data && data.playerName && data.playerName.trim()) ? data.playerName.trim() : "Your Player";
+    },
+
+    // --- PLAYER AVATAR / PICTURE ---
+    setPlayerAvatar(picture) {
+      const picStr = typeof picture === 'string' ? picture : "";
+      this._setItem('vtd_player_avatar', picStr);
+      try {
+        const data = this._cache || this.load();
+        data.playerPicture = picStr;
+        this.save(data);
+      } catch (e) {}
+      if (window.activeGame) {
+        window.activeGame.playerAvatar = picStr;
+        window.activeGame.renderProfileUI?.();
+      }
+      return picStr;
+    },
+    setPlayerPicture(picture) {
+      return this.setPlayerAvatar(picture);
+    },
+    getPlayerAvatar() {
+      const direct = this._getItem('vtd_player_avatar');
+      if (direct) return direct;
+      const data = this._cache || this.load();
+      return (data && data.playerPicture) ? data.playerPicture : "";
+    },
+    getPlayerPicture() {
+      return this.getPlayerAvatar();
+    },
+
+    // --- MONEY ---
+    setMoney(amount) {
+      const num = typeof amount === 'number' && !isNaN(amount) ? Math.max(0, Math.floor(amount)) : 0;
+      this._setItem('vtd_money', num.toString());
+      try {
+        const data = this._cache || this.load();
+        data.money = num;
+        this.save(data);
+      } catch (e) {}
+      if (window.activeGame) {
+        window.activeGame.money = num;
+        window.activeGame.updateMoneyDisplay?.();
+      }
+      return num;
+    },
+    getMoney() {
+      const direct = this._getItem('vtd_money');
+      if (direct !== null && !isNaN(parseInt(direct, 10))) return parseInt(direct, 10);
+      const data = this._cache || this.load();
+      return (data && typeof data.money === 'number') ? data.money : 0;
+    },
+
+    // --- DIFFICULTY ---
+    setDifficulty(diff) {
+      const valid = diff === 'hard' || diff === 'normal' || diff === 'easy' ? diff : 'easy';
+      this._setItem('vtd_difficulty', valid);
+      try {
+        const data = this._cache || this.load();
+        data.difficulty = valid;
+        if (!data.settings) data.settings = {};
+        data.settings.difficulty = valid;
+        this.save(data);
+      } catch (e) {}
+      if (window.activeGame) {
+        window.activeGame.difficulty = valid;
+        if (window.activeGame.settings) window.activeGame.settings.difficulty = valid;
+      }
+      return valid;
+    },
+    getDifficulty() {
+      const direct = this._getItem('vtd_difficulty');
+      if (direct) return direct;
+      const data = this._cache || this.load();
+      return (data && data.settings && data.settings.difficulty) ? data.settings.difficulty : 'easy';
+    },
+
+    // --- MASTER VOLUME ---
+    setMasterVolume(vol) {
+      const v = typeof vol === 'number' && !isNaN(vol) ? Math.max(0, Math.min(1, vol)) : 0.70;
+      this._setItem('vtd_master_volume', v.toString());
+      try {
+        const data = this._cache || this.load();
+        data.masterVolume = v;
+        if (!data.settings) data.settings = {};
+        data.settings.masterVolume = v;
+        this.save(data);
+      } catch (e) {}
+      if (window.activeGame && window.activeGame.sound) {
+        window.activeGame.sound.setMasterVolume(v);
+      }
+      return v;
+    },
+    getMasterVolume() {
+      const direct = this._getItem('vtd_master_volume');
+      if (direct !== null && !isNaN(parseFloat(direct))) return parseFloat(direct);
+      const data = this._cache || this.load();
+      return (data && data.settings && typeof data.settings.masterVolume === 'number') ? data.settings.masterVolume : 0.70;
+    },
+
+    // --- GRAPHICS QUALITY ---
+    setGraphicsQuality(quality) {
+      const q = quality === 'high' || quality === 'low' || quality === 'medium' ? quality : 'medium';
+      this._setItem('vtd_graphics_quality', q);
+      try {
+        const data = this._cache || this.load();
+        data.graphicsQuality = q;
+        if (!data.settings) data.settings = {};
+        data.settings.quality = q;
+        this.save(data);
+      } catch (e) {}
+      if (window.activeGame) {
+        if (window.activeGame.settings) window.activeGame.settings.quality = q;
+      }
+      return q;
+    },
+    getGraphicsQuality() {
+      const direct = this._getItem('vtd_graphics_quality');
+      if (direct) return direct;
+      const data = this._cache || this.load();
+      return (data && data.settings && data.settings.quality) ? data.settings.quality : 'medium';
+    },
+
+    // --- WAVE PROGRESS ---
+    setWave(w) {
+      const wave = typeof w === 'number' && !isNaN(w) ? Math.max(1, Math.floor(w)) : 1;
+      this._setItem('vtd_wave', wave.toString());
+      try {
+        const data = this._cache || this.load();
+        data.wave = wave;
+        this.save(data);
+      } catch (e) {}
+      return wave;
+    },
+    setWaveProgress(w) {
+      return this.setWave(w);
+    },
+    getWave() {
+      const direct = this._getItem('vtd_wave');
+      if (direct !== null && !isNaN(parseInt(direct, 10))) return parseInt(direct, 10);
+      const data = this._cache || this.load();
+      return (data && typeof data.wave === 'number') ? data.wave : 1;
+    },
+    getWaveProgress() {
+      return this.getWave();
+    },
+
+    // --- CASTLE HEALTH ---
+    setCastleHealth(hp) {
+      const health = typeof hp === 'number' && !isNaN(hp) ? Math.max(0, Math.min(100, Math.floor(hp))) : 100;
+      this._setItem('vtd_castle_health', health.toString());
+      try {
+        const data = this._cache || this.load();
+        data.castleHealth = health;
+        this.save(data);
+      } catch (e) {}
+      return health;
+    },
+    getCastleHealth() {
+      const direct = this._getItem('vtd_castle_health');
+      if (direct !== null && !isNaN(parseInt(direct, 10))) return parseInt(direct, 10);
+      const data = this._cache || this.load();
+      return (data && typeof data.castleHealth === 'number') ? data.castleHealth : 100;
+    },
+
+    // --- TASKS ---
+    saveTasks(tasks) {
+      if (!Array.isArray(tasks)) return;
+      try {
+        const minimal = tasks.map(t => ({
+          id: t.id,
+          current: t.current || 0,
+          claimed: !!t.claimed
+        }));
+        this._setItem('vtd_tasks_data', JSON.stringify(minimal));
+        const data = this._cache || this.load();
+        data.tasks = tasks;
+        this.save(data);
+      } catch (e) {}
+    },
+    getTasks() {
+      const data = this._cache || this.load();
+      return (data && data.tasks) ? data.tasks : generate100Tasks();
+    },
+
+    // --- CHALLENGES ---
     saveChallenges(challenges) {
+      if (!Array.isArray(challenges)) return;
       try {
         const minimal = challenges.map(c => ({
           id: c.id,
@@ -573,24 +864,61 @@
           unlocked: !!c.unlocked,
           progress: c.progress || 0
         }));
-        localStorage.setItem('vtd_challenges_data', JSON.stringify(minimal));
+        this._setItem('vtd_challenges_data', JSON.stringify(minimal));
+        const data = this._cache || this.load();
+        data.challenges = challenges;
+        this.save(data);
       } catch (e) {}
     },
+    getChallenges() {
+      const data = this._cache || this.load();
+      return (data && data.challenges) ? data.challenges : generate100Challenges();
+    },
+
+    // --- STATISTICS ---
+    saveStatistics(stats) {
+      if (!stats || typeof stats !== 'object') return;
+      try {
+        const data = this._cache || this.load();
+        Object.assign(data, stats);
+        this.save(data);
+      } catch (e) {}
+    },
+    getStatistics() {
+      const data = this._cache || this.load();
+      return {
+        totalKills: data?.totalKills || 0,
+        highestWave: data?.highestWave || 0,
+        totalPlayingTime: data?.totalPlayingTime || 0,
+        towersBuilt: data?.towersBuilt || 0,
+        towersUpgraded: data?.towersUpgraded || 0,
+        bossesDefeated: data?.bossesDefeated || 0,
+        totalMoneyEarned: data?.totalMoneyEarned || 0,
+        perfectWavesCount: data?.perfectWavesCount || 0,
+        speedWavesCount: data?.speedWavesCount || 0
+      };
+    },
+
+    // --- RESET ALL ---
     resetAll() {
-      localStorage.removeItem('vtd_save_data');
-      localStorage.removeItem('vtd_challenges_data');
-      localStorage.removeItem('vtd_money');
-      localStorage.removeItem('vtd_player_name');
-      localStorage.removeItem('vtd_player_avatar');
-      localStorage.removeItem('vtd_tasks');
-      localStorage.removeItem('vtd_challenges');
-      localStorage.removeItem('vtd_settings');
-      localStorage.removeItem('vtd_difficulty');
-      localStorage.removeItem('vtd_graphics_quality');
-      localStorage.removeItem('vtd_master_volume');
+      const keys = [
+        'vtd_save_data', 'vtd_challenges_data', 'vtd_tasks_data',
+        'vtd_money', 'vtd_player_name', 'vtd_player_avatar',
+        'vtd_tasks', 'vtd_challenges', 'vtd_settings',
+        'vtd_difficulty', 'vtd_graphics_quality', 'vtd_master_volume',
+        'vtd_wave', 'vtd_castle_health'
+      ];
+      keys.forEach(k => this._removeItem(k));
+      this._cache = null;
       return this.load();
     }
   };
+
+  // Safe storage initialization before any screens or UI
+  Storage.init();
+  window.Storage = Storage;
+  window.setPlayerName = (name) => Storage.setPlayerName(name);
+  window.getPlayerName = () => Storage.getPlayerName();
 
   // --- GAME CONSTANTS & DEFINITIONS ---
   const LOGICAL_WIDTH = 360;
@@ -1972,13 +2300,13 @@
       this.sound = new SoundManager();
       this.menuBattle = new MenuBattleBackground();
       this.saveData = Storage.load();
-      this.money = typeof this.saveData.money === 'number' ? this.saveData.money : 0;
-      this.playerName = this.saveData.playerName || "Your Player";
-      this.playerAvatar = this.saveData.playerPicture || "";
-      this.tasks = this.saveData.tasks;
-      this.challenges = this.saveData.challenges;
-      this.settings = this.saveData.settings || { music: true, sfx: true, quality: "medium", difficulty: "easy" };
-      this.difficulty = this.settings.difficulty || localStorage.getItem('vtd_difficulty') || 'easy';
+      this.money = typeof this.saveData.money === 'number' ? this.saveData.money : Storage.getMoney();
+      this.playerName = this.saveData.playerName || Storage.getPlayerName();
+      this.playerAvatar = this.saveData.playerPicture || Storage.getPlayerPicture();
+      this.tasks = this.saveData.tasks || Storage.getTasks();
+      this.challenges = this.saveData.challenges || Storage.getChallenges();
+      this.settings = this.saveData.settings || { music: true, sfx: true, quality: "medium", difficulty: "easy", masterVolume: 0.70 };
+      this.difficulty = this.settings.difficulty || Storage.getDifficulty();
 
       this.totalKills = this.saveData.totalKills || 0;
       this.highestWave = this.saveData.highestWave || 0;
@@ -2067,13 +2395,28 @@
       requestAnimationFrame(ts => this.gameLoop(ts));
     }
 
-    saveAll() {
+    saveGameData() {
+      this.syncStats();
       this.saveData.money = this.money;
       this.saveData.playerName = this.playerName;
       this.saveData.playerPicture = this.playerAvatar;
       this.saveData.tasks = this.tasks;
       this.saveData.challenges = this.challenges;
-      this.saveData.settings = this.settings;
+      this.saveData.difficulty = this.difficulty;
+      const vol = this.sound ? this.sound.masterVolume : 0.70;
+      const qual = this.settings?.quality || 'medium';
+      this.saveData.masterVolume = vol;
+      this.saveData.quality = qual;
+      this.saveData.castleHealth = this.castleHealth || 100;
+      this.saveData.wave = this.wave || 1;
+      this.saveData.settings = {
+        ...this.settings,
+        difficulty: this.difficulty,
+        masterVolume: vol,
+        quality: qual,
+        sfx: this.sound ? this.sound.sfxEnabled : true,
+        music: this.sound ? this.sound.musicEnabled : true
+      };
       this.saveData.totalKills = this.totalKills;
       this.saveData.highestWave = this.highestWave;
       this.saveData.totalPlayingTime = this.totalPlayingTime;
@@ -2083,7 +2426,33 @@
       this.saveData.totalMoneyEarned = this.totalMoneyEarned;
       this.saveData.perfectWavesCount = this.perfectWavesCount;
       this.saveData.speedWavesCount = this.speedWavesCount;
+
       Storage.save(this.saveData);
+      Storage.setPlayerName(this.playerName);
+      if (this.playerAvatar) Storage.setPlayerAvatar(this.playerAvatar);
+      Storage.setMoney(this.money);
+      Storage.setDifficulty(this.difficulty);
+      Storage.setMasterVolume(vol);
+      Storage.setGraphicsQuality(qual);
+      Storage.setCastleHealth(this.castleHealth || 100);
+      Storage.setWave(this.wave || 1);
+      Storage.saveChallenges(this.challenges);
+      Storage.saveTasks(this.tasks);
+      Storage.saveStatistics({
+        totalKills: this.totalKills,
+        highestWave: this.highestWave,
+        totalPlayingTime: this.totalPlayingTime,
+        towersBuilt: this.towersBuilt,
+        towersUpgraded: this.towersUpgraded,
+        bossesDefeated: this.bossesDefeated,
+        totalMoneyEarned: this.totalMoneyEarned,
+        perfectWavesCount: this.perfectWavesCount,
+        speedWavesCount: this.speedWavesCount
+      });
+    }
+
+    saveAll() {
+      this.saveGameData();
     }
 
     syncStats() {
@@ -2114,6 +2483,16 @@
 
     getGraphicsConfig() {
       return GRAPHICS_CONFIG[this.settings.quality] || GRAPHICS_CONFIG.medium;
+    }
+
+    setPlayerName(name) {
+      this.playerName = Storage.setPlayerName(name);
+      this.renderProfileUI();
+      return this.playerName;
+    }
+
+    getPlayerName() {
+      return this.playerName || Storage.getPlayerName();
     }
 
     setDifficulty(diff) {
@@ -2269,35 +2648,104 @@
     }
 
     // --- SCREEN NAVIGATION ---
-    showScreen(id) {
-      const allScreens = [
-        document.getElementById('main-menu'),
-        document.getElementById('challenges-screen'),
-        document.getElementById('gameplay-screen'),
-        document.getElementById('game-over-screen'),
-        document.getElementById('victory-screen'),
-        document.getElementById('exit-screen')
-      ];
+    showScreen(screenOrId) {
+      const screens = {
+        mainMenu: document.getElementById('main-menu'),
+        gameScreen: document.getElementById('gameplay-screen'),
+        gameplayScreen: document.getElementById('gameplay-screen'),
+        challengeScreen: document.getElementById('challenges-screen'),
+        taskScreen: document.getElementById('tasks-modal'),
+        settingsScreen: document.getElementById('settings-modal'),
+        customizationScreen: document.getElementById('profile-modal'),
+        exitScreen: document.getElementById('exit-screen'),
+        gameOverScreen: document.getElementById('game-over-screen'),
+        victoryScreen: document.getElementById('victory-screen')
+      };
 
-      allScreens.forEach(sc => {
-        if (sc) {
-          sc.style.display = 'none';
-          sc.classList.remove('active');
+      let targetEl = null;
+      let targetId = '';
+
+      if (typeof screenOrId === 'string') {
+        if (screens[screenOrId]) {
+          targetEl = screens[screenOrId];
+          targetId = targetEl.id || screenOrId;
+        } else {
+          targetEl = document.getElementById(screenOrId);
+          targetId = screenOrId;
+        }
+      } else if (screenOrId && (screenOrId.nodeType || screenOrId.style || screenOrId.id)) {
+        targetEl = screenOrId;
+        targetId = screenOrId.id || '';
+      }
+
+      // Hide all registered screens
+      const uniqueScreens = new Set(Object.values(screens).filter(Boolean));
+      uniqueScreens.forEach(sc => {
+        sc.style.display = 'none';
+        sc.classList.remove('active');
+        if (sc.classList.contains('modal-overlay')) {
+          sc.classList.add('hidden');
         }
       });
 
-      const sc = document.getElementById(id);
-      if (sc) {
-        sc.style.display = 'flex';
-        sc.classList.add('active');
+      // Close open modals so screens never get blocked
+      const overlayModals = [
+        'tasks-modal',
+        'settings-modal',
+        'profile-modal',
+        'pause-modal',
+        'challenge-complete-modal',
+        'challenge-failed-modal'
+      ];
+      overlayModals.forEach(mId => {
+        const modal = document.getElementById(mId);
+        if (modal && modal !== targetEl) {
+          modal.classList.add('hidden');
+        }
+      });
+
+      if (targetEl) {
+        targetEl.style.display = 'flex';
+        targetEl.classList.add('active');
+        if (targetEl.classList.contains('modal-overlay')) {
+          targetEl.classList.remove('hidden');
+        }
       }
 
       if (this.menuBattle) {
-        if (id === 'main-menu') {
+        if (targetId === 'main-menu') {
           this.menuBattle.resume();
         } else {
           this.menuBattle.pause();
         }
+      }
+    }
+
+    openExitScreen() {
+      this.sound?.buttonClick();
+      this.saveGameData();
+      const exitScreen = document.getElementById('exit-screen');
+      this.showScreen(exitScreen || 'exitScreen');
+    }
+
+    returnToMainMenu() {
+      this.sound?.buttonClick();
+      const mainMenu = document.getElementById('main-menu');
+      this.showScreen(mainMenu || 'mainMenu');
+    }
+
+    closeGame() {
+      this.sound?.buttonClick();
+      this.saveGameData();
+      try {
+        if (window.AndroidBridge && window.AndroidBridge.closeApp) {
+          window.AndroidBridge.closeApp();
+          return;
+        }
+      } catch (e) {}
+      const exitDesc = document.querySelector('.exit-desc');
+      if (exitDesc) {
+        exitDesc.textContent = 'Game saved successfully. You may safely return to your home screen or close the app.';
       }
     }
 
@@ -3954,8 +4402,7 @@
       });
 
       document.getElementById('btn-exit')?.addEventListener('click', () => {
-        this.sound.buttonClick();
-        this.showScreen('exit-screen');
+        this.openExitScreen();
       });
 
       document.getElementById('btn-fullscreen')?.addEventListener('click', async () => {
@@ -3964,8 +4411,11 @@
       });
 
       document.getElementById('btn-return-game')?.addEventListener('click', () => {
-        this.sound.buttonClick();
-        this.showScreen('main-menu');
+        this.returnToMainMenu();
+      });
+
+      document.getElementById('btn-close-game')?.addEventListener('click', () => {
+        this.closeGame();
       });
 
       // Player Profile Customization
@@ -4082,6 +4532,7 @@
 
       document.getElementById('btn-pause-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
+        this.saveGameData();
         this.isPaused = false;
         document.getElementById('pause-modal')?.classList.add('hidden');
         if (this.isChallengeMode) {
@@ -4095,6 +4546,7 @@
 
       document.getElementById('btn-ingame-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
+        this.saveGameData();
         if (this.isChallengeMode) {
           this.exitCurrentChallenge();
         } else {
@@ -4156,6 +4608,7 @@
 
       document.getElementById('btn-go-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
+        this.saveGameData();
         this.showScreen('main-menu');
       });
 
@@ -4167,6 +4620,7 @@
 
       document.getElementById('btn-vic-menu')?.addEventListener('click', () => {
         this.sound.buttonClick();
+        this.saveGameData();
         this.showScreen('main-menu');
       });
 
@@ -4857,6 +5311,7 @@
 
   function initializeGame() {
     try {
+      Storage.init();
       activeGame = new GameState();
       window.gameInstance = activeGame;
     } catch (err) {
@@ -4879,7 +5334,117 @@
     }
   });
 
+  const screens = {
+    get mainMenu() { return document.getElementById('main-menu'); },
+    get gameScreen() { return document.getElementById('gameplay-screen'); },
+    get challengeScreen() { return document.getElementById('challenges-screen'); },
+    get taskScreen() { return document.getElementById('tasks-modal'); },
+    get settingsScreen() { return document.getElementById('settings-modal'); },
+    get customizationScreen() { return document.getElementById('profile-modal'); },
+    get exitScreen() { return document.getElementById('exit-screen'); },
+    get gameOverScreen() { return document.getElementById('game-over-screen'); },
+    get victoryScreen() { return document.getElementById('victory-screen'); }
+  };
+
+  function showScreen(screen) {
+    if (activeGame) {
+      activeGame.showScreen(screen);
+      return;
+    }
+    const all = [
+      document.getElementById('main-menu'),
+      document.getElementById('gameplay-screen'),
+      document.getElementById('challenges-screen'),
+      document.getElementById('tasks-modal'),
+      document.getElementById('settings-modal'),
+      document.getElementById('profile-modal'),
+      document.getElementById('exit-screen'),
+      document.getElementById('game-over-screen'),
+      document.getElementById('victory-screen')
+    ];
+    all.forEach(s => {
+      if (s) {
+        s.style.display = 'none';
+        s.classList?.remove('active');
+        if (s.classList?.contains('modal-overlay')) {
+          s.classList.add('hidden');
+        }
+      }
+    });
+
+    let target = null;
+    if (typeof screen === 'string') {
+      target = document.getElementById(screen) || screens[screen];
+    } else if (screen && (screen.nodeType || screen.style || screen.id)) {
+      target = screen;
+    }
+    if (target) {
+      target.style.display = 'flex';
+      target.classList?.add('active');
+      if (target.classList?.contains('modal-overlay')) {
+        target.classList.remove('hidden');
+      }
+    }
+  }
+
+  function openExitScreen() {
+    saveGameData();
+    const exitScreen = document.getElementById('exit-screen');
+    const mainMenu = document.getElementById('main-menu');
+    if (activeGame) {
+      activeGame.openExitScreen();
+    } else {
+      if (mainMenu) mainMenu.style.display = 'none';
+      if (exitScreen) exitScreen.style.display = 'flex';
+      showScreen(exitScreen);
+    }
+  }
+
+  function returnToMainMenu() {
+    const exitScreen = document.getElementById('exit-screen');
+    const mainMenu = document.getElementById('main-menu');
+    if (activeGame) {
+      activeGame.returnToMainMenu();
+    } else {
+      if (exitScreen) exitScreen.style.display = 'none';
+      if (mainMenu) mainMenu.style.display = 'flex';
+      showScreen(mainMenu);
+    }
+  }
+
+  function saveGameData() {
+    if (activeGame) {
+      activeGame.saveGameData();
+    } else {
+      Storage.save(Storage.load());
+    }
+  }
+
+  function closeGame() {
+    if (activeGame) {
+      activeGame.closeGame();
+    } else {
+      saveGameData();
+      try {
+        if (window.AndroidBridge && window.AndroidBridge.closeApp) {
+          window.AndroidBridge.closeApp();
+          return;
+        }
+      } catch (e) {}
+      const exitDesc = document.querySelector('.exit-desc');
+      if (exitDesc) {
+        exitDesc.textContent = 'Game saved successfully. You may safely return to your home screen or close the app.';
+      }
+    }
+  }
+
   // Global API hooks
+  window.screens = screens;
+  window.showScreen = showScreen;
+  window.openExitScreen = openExitScreen;
+  window.returnToMainMenu = returnToMainMenu;
+  window.saveGameData = saveGameData;
+  window.closeGame = closeGame;
   window.create100Challenges = create100Challenges;
   window.generate100Challenges = generate100Challenges;
   window.openChallenges = () => activeGame?.openChallengesScreen();
@@ -4890,7 +5455,21 @@
   window.addEventListener('resize', resizeGame);
   window.addEventListener('orientationchange', resizeGame);
 
-  function attachChallengeDirectListeners() {
+  function exposeGlobalElements() {
+    window.mainMenu = document.getElementById('main-menu');
+    window.exitScreen = document.getElementById('exit-screen');
+    window.gameScreen = document.getElementById('gameplay-screen');
+    window.challengeScreen = document.getElementById('challenges-screen');
+    window.taskScreen = document.getElementById('tasks-modal');
+    window.settingsScreen = document.getElementById('settings-modal');
+    window.customizationScreen = document.getElementById('profile-modal');
+    window.exitButton = document.getElementById('btn-exit');
+    window.returnToGameButton = document.getElementById('btn-return-game');
+  }
+
+  function attachDirectListeners() {
+    exposeGlobalElements();
+
     const btnCh = document.getElementById('btn-challenge');
     if (btnCh) {
       btnCh.addEventListener('click', () => {
@@ -4903,17 +5482,42 @@
         activeGame?.closeChallenges();
       });
     }
+
+    const btnExit = document.getElementById('btn-exit');
+    if (btnExit) {
+      btnExit.onclick = (e) => {
+        e?.preventDefault?.();
+        openExitScreen();
+      };
+      btnExit.addEventListener('click', openExitScreen);
+    }
+    const btnReturn = document.getElementById('btn-return-game');
+    if (btnReturn) {
+      btnReturn.onclick = (e) => {
+        e?.preventDefault?.();
+        returnToMainMenu();
+      };
+      btnReturn.addEventListener('click', returnToMainMenu);
+    }
+    const btnClose = document.getElementById('btn-close-game');
+    if (btnClose) {
+      btnClose.onclick = (e) => {
+        e?.preventDefault?.();
+        closeGame();
+      };
+      btnClose.addEventListener('click', closeGame);
+    }
   }
 
   if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => {
       initializeGame();
       resizeGame();
-      attachChallengeDirectListeners();
+      attachDirectListeners();
     });
   } else {
     initializeGame();
     resizeGame();
-    attachChallengeDirectListeners();
+    attachDirectListeners();
   }
 })();
