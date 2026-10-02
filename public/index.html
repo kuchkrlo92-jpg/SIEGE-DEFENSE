@@ -106,13 +106,17 @@
           <span class="stat-icon">🏰</span>
           <span id="hud-castle" class="stat-value">100 / 100</span>
         </div>
+        <div class="hud-stat" id="stat-wave">
+          <span class="stat-icon">🌊</span>
+          <span id="hud-wave" class="stat-value">WAVE 1 / 50</span>
+        </div>
         <div class="hud-stat" id="stat-money">
           <span class="stat-icon">💰</span>
           <span id="hud-money" class="stat-value">Rs 0</span>
         </div>
-        <div class="hud-stat" id="stat-wave">
-          <span class="stat-icon">🌊</span>
-          <span id="hud-wave" class="stat-value">WAVE 1 / 100</span>
+        <div class="hud-stat" id="stat-kills">
+          <span class="stat-icon">💀</span>
+          <span id="hud-kills" class="stat-value">0</span>
         </div>
         <div class="hud-controls">
           <button id="btn-speed" class="hud-btn" title="Toggle Speed">1x</button>
@@ -142,12 +146,6 @@
       <!-- Battle Canvas Area -->
       <div id="canvas-container">
         <canvas id="game-canvas"></canvas>
-
-        <!-- Quick Map Camera Navigation -->
-        <div id="map-scroll-controls" class="map-scroll-controls">
-          <button id="btn-scroll-top" class="btn-scroll-nav" title="View Enemy Spawn">⬆️ SPAWN</button>
-          <button id="btn-scroll-castle" class="btn-scroll-nav" title="View Castle">⬇️ CASTLE</button>
-        </div>
 
         <!-- Selected Tile Build Banner -->
         <div id="tile-selection-hint" class="tile-selection-hint hidden">
@@ -299,8 +297,9 @@
           <label for="input-player-name">Player Name</label>
           <input type="text" id="input-player-name" maxlength="20" placeholder="Enter commander name..." />
         </div>
-        <div class="modal-footer">
-          <button id="btn-save-profile" class="btn-primary full-width">SAVE</button>
+        <div class="modal-footer profile-modal-footer">
+          <button type="button" class="btn-secondary modal-btn-cancel" data-close="profile-modal">CANCEL</button>
+          <button id="btn-save-profile" class="btn-primary modal-btn-save">SAVE</button>
         </div>
       </div>
     </div>
@@ -470,17 +469,17 @@
       </div>
     </div>
 
-    <!-- VICTORY SCREEN (100 WAVES COMPLETED) -->
+    <!-- VICTORY SCREEN -->
     <div id="victory-screen" class="screen">
       <div class="victory-card">
         <div class="victory-trophy">🏆</div>
-        <h1 class="victory-title">100 WAVES COMPLETED!</h1>
-        <p class="victory-subtitle">CITADEL DEFENDED & REALM SECURED</p>
+        <h1 id="vic-title" class="victory-title">50 / 50 WAVES COMPLETED!</h1>
+        <p id="vic-subtitle" class="victory-subtitle">CITADEL DEFENDED & REALM SECURED</p>
         
         <div class="victory-stats">
           <div class="victory-stat-line">
             <span class="stat-line-label">Waves Cleared:</span>
-            <span class="stat-line-val highlight">100 / 100</span>
+            <span id="vic-waves" class="stat-line-val highlight">50 / 50</span>
           </div>
           <div class="victory-stat-line">
             <span class="stat-line-label">Difficulty:</span>
@@ -564,6 +563,14 @@
           <button id="btn-retry-challenge" class="btn-primary full-width">RETRY</button>
           <button id="btn-back-challenges-from-fail" class="btn-secondary full-width">BACK TO CHALLENGES</button>
         </div>
+      </div>
+    </div>
+    <!-- ORIENTATION LOCK OVERLAY FOR MOBILE LANDSCAPE -->
+    <div id="rotate-device-overlay" class="rotate-overlay">
+      <div class="rotate-box">
+        <div class="rotate-phone-icon">📱</div>
+        <h2 class="rotate-title">PLEASE ROTATE YOUR DEVICE</h2>
+        <p class="rotate-sub">PORTRAIT MODE</p>
       </div>
     </div>
   </div>

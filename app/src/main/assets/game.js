@@ -181,74 +181,113 @@
     }
   }
 
-  // --- 100 PROGRESSIVE TASKS GENERATOR ---
+  // --- 100 PROGRESSIVE HARDER TASKS GENERATOR ---
   function generate100Tasks() {
-    const list = [];
-    // Task 1: Citadel Oath (claimable immediately)
-    list.push({ id: 't_init', name: 'Citadel Oath', desc: 'Report for duty and accept commission', target: 1, current: 1, reward: 150, claimed: false, type: 'init' });
+    const list = [
+      // Required 15 baseline harder tasks
+      { id: 't_1', name: 'Task 1: Slayer I', desc: 'Kill 100 enemies', target: 100, current: 0, reward: 200, claimed: false, type: 'kills' },
+      { id: 't_2', name: 'Task 2: Slayer II', desc: 'Kill 250 enemies', target: 250, current: 0, reward: 350, claimed: false, type: 'kills' },
+      { id: 't_3', name: 'Task 3: Slayer III', desc: 'Kill 500 enemies', target: 500, current: 0, reward: 500, claimed: false, type: 'kills' },
+      { id: 't_4', name: 'Task 4: Defender I', desc: 'Complete 10 waves', target: 10, current: 0, reward: 300, claimed: false, type: 'waves' },
+      { id: 't_5', name: 'Task 5: Defender II', desc: 'Complete 25 waves', target: 25, current: 0, reward: 600, claimed: false, type: 'waves' },
+      { id: 't_6', name: 'Task 6: Defender III', desc: 'Complete 50 waves', target: 50, current: 0, reward: 1200, claimed: false, type: 'waves' },
+      { id: 't_7', name: 'Task 7: Architect I', desc: 'Build 25 towers', target: 25, current: 0, reward: 400, claimed: false, type: 'builds' },
+      { id: 't_8', name: 'Task 8: Architect II', desc: 'Build 50 towers', target: 50, current: 0, reward: 800, claimed: false, type: 'builds' },
+      { id: 't_9', name: 'Task 9: Engineer I', desc: 'Upgrade towers 25 times', target: 25, current: 0, reward: 500, claimed: false, type: 'upgrades' },
+      { id: 't_10', name: 'Task 10: Engineer II', desc: 'Upgrade towers 100 times', target: 100, current: 0, reward: 1500, claimed: false, type: 'upgrades' },
+      { id: 't_11', name: 'Task 11: Titan Hunter I', desc: 'Defeat 10 bosses', target: 10, current: 0, reward: 800, claimed: false, type: 'bosses' },
+      { id: 't_12', name: 'Task 12: Titan Hunter II', desc: 'Defeat 25 bosses', target: 25, current: 0, reward: 1500, claimed: false, type: 'bosses' },
+      { id: 't_13', name: 'Task 13: Treasury I', desc: 'Earn Rs 5,000 in combat', target: 5000, current: 0, reward: 750, claimed: false, type: 'earnings' },
+      { id: 't_14', name: 'Task 14: Treasury II', desc: 'Earn Rs 10,000 in combat', target: 10000, current: 0, reward: 1200, claimed: false, type: 'earnings' },
+      { id: 't_15', name: 'Task 15: Flawless Guard', desc: 'Complete a wave without losing castle health', target: 1, current: 0, reward: 400, claimed: false, type: 'perfect' },
 
-    // 24 Kills tiers
-    const killTiers = [
-      [5, 40], [15, 60], [30, 90], [50, 120], [75, 160],
-      [100, 200], [150, 250], [200, 300], [300, 400], [400, 500],
-      [500, 600], [650, 750], [800, 900], [1000, 1100], [1250, 1300],
-      [1500, 1600], [2000, 2000], [2500, 2500], [3000, 3000], [4000, 4000],
-      [5000, 5000], [6500, 6500], [8000, 8000], [10000, 10000]
+      // Progressively difficult tasks 16 to 100
+      { id: 't_16', name: 'Task 16: Slayer IV', desc: 'Kill 750 enemies', target: 750, current: 0, reward: 700, claimed: false, type: 'kills' },
+      { id: 't_17', name: 'Task 17: Defender IV', desc: 'Complete 67 waves', target: 67, current: 0, reward: 1500, claimed: false, type: 'waves' },
+      { id: 't_18', name: 'Task 18: Architect III', desc: 'Build 75 towers', target: 75, current: 0, reward: 1000, claimed: false, type: 'builds' },
+      { id: 't_19', name: 'Task 19: Titan Hunter III', desc: 'Defeat 35 bosses', target: 35, current: 0, reward: 2000, claimed: false, type: 'bosses' },
+      { id: 't_20', name: 'Task 20: Treasury III', desc: 'Earn Rs 20,000 in combat', target: 20000, current: 0, reward: 1800, claimed: false, type: 'earnings' },
+      { id: 't_21', name: 'Task 21: Flawless Guard II', desc: 'Complete 5 waves without losing castle health', target: 5, current: 0, reward: 800, claimed: false, type: 'perfect' },
+      { id: 't_22', name: 'Task 22: Slayer V', desc: 'Kill 1,000 enemies', target: 1000, current: 0, reward: 1000, claimed: false, type: 'kills' },
+      { id: 't_23', name: 'Task 23: Defender V', desc: 'Complete 75 waves', target: 75, current: 0, reward: 1800, claimed: false, type: 'waves' },
+      { id: 't_24', name: 'Task 24: Engineer III', desc: 'Upgrade towers 150 times', target: 150, current: 0, reward: 2000, claimed: false, type: 'upgrades' },
+      { id: 't_25', name: 'Task 25: Architect IV', desc: 'Build 100 towers', target: 100, current: 0, reward: 1300, claimed: false, type: 'builds' },
+      { id: 't_26', name: 'Task 26: Titan Hunter IV', desc: 'Defeat 50 bosses', target: 50, current: 0, reward: 2500, claimed: false, type: 'bosses' },
+      { id: 't_27', name: 'Task 27: Treasury IV', desc: 'Earn Rs 35,000 in combat', target: 35000, current: 0, reward: 2400, claimed: false, type: 'earnings' },
+      { id: 't_28', name: 'Task 28: Flawless Guard III', desc: 'Complete 10 waves without losing castle health', target: 10, current: 0, reward: 1200, claimed: false, type: 'perfect' },
+      { id: 't_29', name: 'Task 29: Slayer VI', desc: 'Kill 1,500 enemies', target: 1500, current: 0, reward: 1400, claimed: false, type: 'kills' },
+      { id: 't_30', name: 'Task 30: Defender VI', desc: 'Complete 100 waves', target: 100, current: 0, reward: 3000, claimed: false, type: 'waves' },
+      { id: 't_31', name: 'Task 31: Architect V', desc: 'Build 125 towers', target: 125, current: 0, reward: 1600, claimed: false, type: 'builds' },
+      { id: 't_32', name: 'Task 32: Engineer IV', desc: 'Upgrade towers 200 times', target: 200, current: 0, reward: 2500, claimed: false, type: 'upgrades' },
+      { id: 't_33', name: 'Task 33: Titan Hunter V', desc: 'Defeat 65 bosses', target: 65, current: 0, reward: 3000, claimed: false, type: 'bosses' },
+      { id: 't_34', name: 'Task 34: Treasury V', desc: 'Earn Rs 50,000 in combat', target: 50000, current: 0, reward: 3200, claimed: false, type: 'earnings' },
+      { id: 't_35', name: 'Task 35: Flawless Guard IV', desc: 'Complete 15 waves without losing castle health', target: 15, current: 0, reward: 1600, claimed: false, type: 'perfect' },
+      { id: 't_36', name: 'Task 36: Slayer VII', desc: 'Kill 2,000 enemies', target: 2000, current: 0, reward: 1800, claimed: false, type: 'kills' },
+      { id: 't_37', name: 'Task 37: Defender VII', desc: 'Complete 120 waves', target: 120, current: 0, reward: 3500, claimed: false, type: 'waves' },
+      { id: 't_38', name: 'Task 38: Architect VI', desc: 'Build 150 towers', target: 150, current: 0, reward: 1900, claimed: false, type: 'builds' },
+      { id: 't_39', name: 'Task 39: Engineer V', desc: 'Upgrade towers 250 times', target: 250, current: 0, reward: 3000, claimed: false, type: 'upgrades' },
+      { id: 't_40', name: 'Task 40: Titan Hunter VI', desc: 'Defeat 80 bosses', target: 80, current: 0, reward: 3500, claimed: false, type: 'bosses' },
+      { id: 't_41', name: 'Task 41: Treasury VI', desc: 'Earn Rs 75,000 in combat', target: 75000, current: 0, reward: 4000, claimed: false, type: 'earnings' },
+      { id: 't_42', name: 'Task 42: Flawless Guard V', desc: 'Complete 20 waves without losing castle health', target: 20, current: 0, reward: 2000, claimed: false, type: 'perfect' },
+      { id: 't_43', name: 'Task 43: Slayer VIII', desc: 'Kill 2,500 enemies', target: 2500, current: 0, reward: 2200, claimed: false, type: 'kills' },
+      { id: 't_44', name: 'Task 44: Defender VIII', desc: 'Complete 140 waves', target: 140, current: 0, reward: 4000, claimed: false, type: 'waves' },
+      { id: 't_45', name: 'Task 45: Architect VII', desc: 'Build 175 towers', target: 175, current: 0, reward: 2200, claimed: false, type: 'builds' },
+      { id: 't_46', name: 'Task 46: Engineer VI', desc: 'Upgrade towers 300 times', target: 300, current: 0, reward: 3600, claimed: false, type: 'upgrades' },
+      { id: 't_47', name: 'Task 47: Titan Hunter VII', desc: 'Defeat 100 bosses', target: 100, current: 0, reward: 4200, claimed: false, type: 'bosses' },
+      { id: 't_48', name: 'Task 48: Treasury VII', desc: 'Earn Rs 100,000 in combat', target: 100000, current: 0, reward: 5000, claimed: false, type: 'earnings' },
+      { id: 't_49', name: 'Task 49: Flawless Guard VI', desc: 'Complete 25 waves without losing castle health', target: 25, current: 0, reward: 2500, claimed: false, type: 'perfect' },
+      { id: 't_50', name: 'Task 50: Slayer IX', desc: 'Kill 3,000 enemies', target: 3000, current: 0, reward: 2600, claimed: false, type: 'kills' },
+      { id: 't_51', name: 'Task 51: Defender IX', desc: 'Complete 160 waves', target: 160, current: 0, reward: 4500, claimed: false, type: 'waves' },
+      { id: 't_52', name: 'Task 52: Architect VIII', desc: 'Build 200 towers', target: 200, current: 0, reward: 2500, claimed: false, type: 'builds' },
+      { id: 't_53', name: 'Task 53: Engineer VII', desc: 'Upgrade towers 350 times', target: 350, current: 0, reward: 4200, claimed: false, type: 'upgrades' },
+      { id: 't_54', name: 'Task 54: Titan Hunter VIII', desc: 'Defeat 125 bosses', target: 125, current: 0, reward: 4800, claimed: false, type: 'bosses' },
+      { id: 't_55', name: 'Task 55: Treasury VIII', desc: 'Earn Rs 150,000 in combat', target: 150000, current: 0, reward: 6000, claimed: false, type: 'earnings' },
+      { id: 't_56', name: 'Task 56: Slayer X', desc: 'Kill 4,000 enemies', target: 4000, current: 0, reward: 3200, claimed: false, type: 'kills' },
+      { id: 't_57', name: 'Task 57: Defender X', desc: 'Complete 180 waves', target: 180, current: 0, reward: 5000, claimed: false, type: 'waves' },
+      { id: 't_58', name: 'Task 58: Architect IX', desc: 'Build 250 towers', target: 250, current: 0, reward: 3000, claimed: false, type: 'builds' },
+      { id: 't_59', name: 'Task 59: Engineer VIII', desc: 'Upgrade towers 400 times', target: 400, current: 0, reward: 4800, claimed: false, type: 'upgrades' },
+      { id: 't_60', name: 'Task 60: Titan Hunter IX', desc: 'Defeat 150 bosses', target: 150, current: 0, reward: 5500, claimed: false, type: 'bosses' },
+      { id: 't_61', name: 'Task 61: Treasury IX', desc: 'Earn Rs 200,000 in combat', target: 20000, current: 0, reward: 7000, claimed: false, type: 'earnings' },
+      { id: 't_62', name: 'Task 62: Flawless Guard VII', desc: 'Complete 35 waves without losing castle health', target: 35, current: 0, reward: 3000, claimed: false, type: 'perfect' },
+      { id: 't_63', name: 'Task 63: Slayer XI', desc: 'Kill 5,000 enemies', target: 5000, current: 0, reward: 4000, claimed: false, type: 'kills' },
+      { id: 't_64', name: 'Task 64: Defender XI', desc: 'Complete 200 waves', target: 200, current: 0, reward: 6000, claimed: false, type: 'waves' },
+      { id: 't_65', name: 'Task 65: Architect X', desc: 'Build 300 towers', target: 300, current: 0, reward: 3500, claimed: false, type: 'builds' },
+      { id: 't_66', name: 'Task 66: Engineer IX', desc: 'Upgrade towers 500 times', target: 500, current: 0, reward: 5500, claimed: false, type: 'upgrades' },
+      { id: 't_67', name: 'Task 67: Titan Hunter X', desc: 'Defeat 175 bosses', target: 175, current: 0, reward: 6200, claimed: false, type: 'bosses' },
+      { id: 't_68', name: 'Task 68: Treasury X', desc: 'Earn Rs 250,000 in combat', target: 250000, current: 0, reward: 8000, claimed: false, type: 'earnings' },
+      { id: 't_69', name: 'Task 69: Slayer XII', desc: 'Kill 6,500 enemies', target: 6500, current: 0, reward: 4800, claimed: false, type: 'kills' },
+      { id: 't_70', name: 'Task 70: Defender XII', desc: 'Complete 225 waves', target: 225, current: 0, reward: 6500, claimed: false, type: 'waves' },
+      { id: 't_71', name: 'Task 71: Architect XI', desc: 'Build 350 towers', target: 350, current: 0, reward: 4000, claimed: false, type: 'builds' },
+      { id: 't_72', name: 'Task 72: Engineer X', desc: 'Upgrade towers 600 times', target: 600, current: 0, reward: 6200, claimed: false, type: 'upgrades' },
+      { id: 't_73', name: 'Task 73: Titan Hunter XI', desc: 'Defeat 200 bosses', target: 200, current: 0, reward: 7000, claimed: false, type: 'bosses' },
+      { id: 't_74', name: 'Task 74: Treasury XI', desc: 'Earn Rs 350,000 in combat', target: 350000, current: 0, reward: 9500, claimed: false, type: 'earnings' },
+      { id: 't_75', name: 'Task 75: Flawless Guard VIII', desc: 'Complete 50 waves without losing castle health', target: 50, current: 0, reward: 4000, claimed: false, type: 'perfect' },
+      { id: 't_76', name: 'Task 76: Slayer XIII', desc: 'Kill 8,000 enemies', target: 8000, current: 0, reward: 5500, claimed: false, type: 'kills' },
+      { id: 't_77', name: 'Task 77: Defender XIII', desc: 'Complete 250 waves', target: 250, current: 0, reward: 7000, claimed: false, type: 'waves' },
+      { id: 't_78', name: 'Task 78: Architect XII', desc: 'Build 400 towers', target: 400, current: 0, reward: 4500, claimed: false, type: 'builds' },
+      { id: 't_79', name: 'Task 79: Engineer XI', desc: 'Upgrade towers 750 times', target: 750, current: 0, reward: 7200, claimed: false, type: 'upgrades' },
+      { id: 't_80', name: 'Task 80: Titan Hunter XII', desc: 'Defeat 250 bosses', target: 250, current: 0, reward: 8000, claimed: false, type: 'bosses' },
+      { id: 't_81', name: 'Task 81: Treasury XII', desc: 'Earn Rs 500,000 in combat', target: 500000, current: 0, reward: 11000, claimed: false, type: 'earnings' },
+      { id: 't_82', name: 'Task 82: Slayer XIV', desc: 'Kill 10,000 enemies', target: 10000, current: 0, reward: 6500, claimed: false, type: 'kills' },
+      { id: 't_83', name: 'Task 83: Defender XIV', desc: 'Complete 275 waves', target: 275, current: 0, reward: 8000, claimed: false, type: 'waves' },
+      { id: 't_84', name: 'Task 84: Architect XIII', desc: 'Build 450 towers', target: 450, current: 0, reward: 5000, claimed: false, type: 'builds' },
+      { id: 't_85', name: 'Task 85: Engineer XII', desc: 'Upgrade towers 900 times', target: 900, current: 0, reward: 8000, claimed: false, type: 'upgrades' },
+      { id: 't_86', name: 'Task 86: Titan Hunter XIII', desc: 'Defeat 300 bosses', target: 300, current: 0, reward: 9000, claimed: false, type: 'bosses' },
+      { id: 't_87', name: 'Task 87: Treasury XIII', desc: 'Earn Rs 750,000 in combat', target: 750000, current: 0, reward: 13000, claimed: false, type: 'earnings' },
+      { id: 't_88', name: 'Task 88: Flawless Guard IX', desc: 'Complete 75 waves without losing castle health', target: 75, current: 0, reward: 5000, claimed: false, type: 'perfect' },
+      { id: 't_89', name: 'Task 89: Slayer XV', desc: 'Kill 12,500 enemies', target: 12500, current: 0, reward: 7500, claimed: false, type: 'kills' },
+      { id: 't_90', name: 'Task 90: Defender XV', desc: 'Complete 300 waves', target: 300, current: 0, reward: 9000, claimed: false, type: 'waves' },
+      { id: 't_91', name: 'Task 91: Architect XIV', desc: 'Build 500 towers', target: 500, current: 0, reward: 6000, claimed: false, type: 'builds' },
+      { id: 't_92', name: 'Task 92: Engineer XIII', desc: 'Upgrade towers 1,000 times', target: 1000, current: 0, reward: 9000, claimed: false, type: 'upgrades' },
+      { id: 't_93', name: 'Task 93: Titan Hunter XIV', desc: 'Defeat 350 bosses', target: 350, current: 0, reward: 10000, claimed: false, type: 'bosses' },
+      { id: 't_94', name: 'Task 94: Treasury XIV', desc: 'Earn Rs 1,000,000 in combat', target: 1000000, current: 0, reward: 16000, claimed: false, type: 'earnings' },
+      { id: 't_95', name: 'Task 95: Flawless Guard X', desc: 'Complete 100 waves without losing castle health', target: 100, current: 0, reward: 7000, claimed: false, type: 'perfect' },
+      { id: 't_96', name: 'Task 96: Slayer XVI', desc: 'Kill 15,000 enemies', target: 15000, current: 0, reward: 9000, claimed: false, type: 'kills' },
+      { id: 't_97', name: 'Task 97: Defender XVI', desc: 'Complete 350 waves', target: 350, current: 0, reward: 11000, claimed: false, type: 'waves' },
+      { id: 't_98', name: 'Task 98: Engineer XIV', desc: 'Upgrade towers 1,500 times', target: 1500, current: 0, reward: 12000, claimed: false, type: 'upgrades' },
+      { id: 't_99', name: 'Task 99: Titan Hunter XV', desc: 'Defeat 500 bosses', target: 500, current: 0, reward: 15000, claimed: false, type: 'bosses' },
+      { id: 't_100', name: 'Task 100: Grand Marshal', desc: 'Kill 50,000 enemies and secure the realm forever', target: 50000, current: 0, reward: 50000, claimed: false, type: 'kills' }
     ];
-    killTiers.forEach(([t, r]) => {
-      list.push({ id: `t_kill_${t}`, name: `Kill ${t} Enemies`, desc: `Defeat ${t} monster invaders`, target: t, current: 0, reward: r, claimed: false, type: 'kills' });
-    });
-
-    // 25 Waves tiers
-    const waveTiers = [
-      [1, 50], [2, 75], [3, 100], [4, 125], [5, 160],
-      [6, 190], [7, 220], [8, 260], [9, 300], [10, 350],
-      [12, 420], [14, 500], [16, 600], [18, 700], [20, 850],
-      [25, 1000], [30, 1200], [35, 1450], [40, 1700], [45, 2000],
-      [50, 2400], [60, 3000], [70, 3700], [80, 4500], [100, 6000]
-    ];
-    waveTiers.forEach(([w, r]) => {
-      list.push({ id: `t_wave_${w}`, name: `Complete Wave ${w}`, desc: `Survive defense wave ${w}`, target: w, current: 0, reward: r, claimed: false, type: 'waves' });
-    });
-
-    // 15 Builds tiers
-    const buildTiers = [
-      [1, 40], [3, 70], [5, 110], [8, 150], [12, 200],
-      [16, 260], [20, 320], [25, 400], [30, 500], [40, 650],
-      [50, 850], [75, 1200], [100, 1600], [150, 2400], [200, 3500]
-    ];
-    buildTiers.forEach(([b, r]) => {
-      list.push({ id: `t_bld_${b}`, name: `Build ${b} Towers`, desc: `Place ${b} towers on pedestals`, target: b, current: 0, reward: r, claimed: false, type: 'builds' });
-    });
-
-    // 15 Upgrades tiers
-    const upgTiers = [
-      [1, 50], [3, 90], [5, 130], [8, 180], [12, 240],
-      [16, 320], [20, 400], [25, 500], [30, 650], [40, 850],
-      [50, 1100], [75, 1500], [100, 2000], [150, 2800], [200, 4000]
-    ];
-    upgTiers.forEach(([u, r]) => {
-      list.push({ id: `t_upg_${u}`, name: `Upgrade Towers ${u} Times`, desc: `Rank up defenses ${u} times`, target: u, current: 0, reward: r, claimed: false, type: 'upgrades' });
-    });
-
-    // 10 Bosses tiers
-    const bossTiers = [
-      [1, 250], [2, 400], [3, 600], [5, 900], [7, 1300],
-      [10, 1800], [15, 2600], [20, 3500], [30, 5000], [50, 8000]
-    ];
-    bossTiers.forEach(([bo, r]) => {
-      list.push({ id: `t_boss_${bo}`, name: `Defeat ${bo} Bosses`, desc: `Vanquish ${bo} titan bosses`, target: bo, current: 0, reward: r, claimed: false, type: 'bosses' });
-    });
-
-    // 10 Earnings tiers (Total: 1 + 24 + 25 + 15 + 15 + 10 + 10 = 100)
-    const earnTiers = [
-      [200, 80], [500, 150], [1000, 250], [2000, 450], [5000, 900],
-      [10000, 1600], [20000, 2800], [50000, 6000], [100000, 11000], [200000, 22000]
-    ];
-    earnTiers.forEach(([e, r]) => {
-      list.push({ id: `t_earn_${e}`, name: `Earn Rs ${e.toLocaleString()}`, desc: `Collect Rs ${e.toLocaleString()} in combat`, target: e, current: 0, reward: r, claimed: false, type: 'earnings' });
-    });
-
     return list;
   }
 
@@ -407,35 +446,41 @@
     easy: {
       id: 'easy',
       name: 'EASY',
-      enemyHpMultiplier: 0.8,
-      enemyCastleDamageMultiplier: 0.7,
+      maxWaves: 50,
+      startingCastleHealth: 100,
+      basicEnemyHp: 3,
+      enemyHpMultiplier: 1.0,
+      enemyCastleDamageMultiplier: 1.0,
       spawnInterval: 1.4,
       enemySpeedMultiplier: 0.75,
       towerDamageMultiplier: 1.0,
-      startingCastleHealth: 100,
-      desc: '<strong>EASY:</strong> Enemy HP: Low | Castle Dmg: Low | Speed: Very Slow | Spawns: Slow. Suitable for beginners.'
+      desc: '<strong>EASY:</strong> 50 Waves | Castle: 100 HP | Basic Enemy: 3 HP. Slow and strategic. Suitable for beginners.'
     },
     normal: {
       id: 'normal',
       name: 'NORMAL',
-      enemyHpMultiplier: 1.0,
+      maxWaves: 67,
+      startingCastleHealth: 67,
+      basicEnemyHp: 4,
+      enemyHpMultiplier: 1.25,
       enemyCastleDamageMultiplier: 1.0,
-      spawnInterval: 1.0,
-      enemySpeedMultiplier: 0.95,
+      spawnInterval: 1.1,
+      enemySpeedMultiplier: 0.85,
       towerDamageMultiplier: 1.0,
-      startingCastleHealth: 100,
-      desc: '<strong>NORMAL:</strong> Enemy HP: Medium | Castle Dmg: Medium | Speed: Slow | Spawns: Medium. Standard balanced challenge.'
+      desc: '<strong>NORMAL:</strong> 67 Waves | Castle: 67 HP | Basic Enemy: 4 HP. Balanced defense challenge.'
     },
     hard: {
       id: 'hard',
       name: 'HARD',
-      enemyHpMultiplier: 1.35,
+      maxWaves: 100,
+      startingCastleHealth: 40,
+      basicEnemyHp: 5,
+      enemyHpMultiplier: 1.6,
       enemyCastleDamageMultiplier: 1.5,
-      spawnInterval: 0.75,
-      enemySpeedMultiplier: 1.2,
-      towerDamageMultiplier: 0.85,
-      startingCastleHealth: 100,
-      desc: '<strong>HARD:</strong> Enemy HP: High | Castle Dmg: High | Speed: Slow-to-medium | Spawns: Fast | Tower Dmg: Slightly reduced.'
+      spawnInterval: 0.85,
+      enemySpeedMultiplier: 0.95,
+      towerDamageMultiplier: 0.9,
+      desc: '<strong>HARD:</strong> 100 Waves | Castle: 40 HP | Basic Enemy: 5 HP. Relentless waves & challenging bosses!'
     }
   };
 
@@ -924,29 +969,27 @@
   const LOGICAL_WIDTH = 360;
   const LOGICAL_HEIGHT = 640;
 
-  // Grid Configuration for Long Vertical Battlefield
+  // Grid Configuration for Compact Vertical 9:16 Battlefield
   const TILE_SIZE = 40;
   const GRID_COLS = 9;   // 9 * 40 = 360px (fills width)
-  const GRID_ROWS = 28;  // 28 * 40 = 1120px (long vertical battlefield with scroll)
+  const GRID_ROWS = 13;  // 13 * 40 = 520px (compact vertical battlefield, fits comfortably in 9:16)
   const MAP_WIDTH = GRID_COLS * TILE_SIZE;
   const MAP_HEIGHT = GRID_ROWS * TILE_SIZE;
 
-  // Long winding dirt/stone enemy path through the grid with many turns and switchbacks
+  // Winding dirt/stone enemy path through the compact grid with multiple turns
   const PATH_WAYPOINTS = [
-    { x: 180, y: -20 },   // Top Enemy Spawn (col 4, above row 0)
-    { x: 180, y: 100 },   // Down to (col 4, row 2)
-    { x: 300, y: 100 },   // Right to (col 7, row 2)
-    { x: 300, y: 220 },   // Down to (col 7, row 5)
-    { x: 60,  y: 220 },   // Left switchback across to (col 1, row 5)
-    { x: 60,  y: 380 },   // Down to (col 1, row 9)
-    { x: 300, y: 380 },   // Right switchback across to (col 7, row 9)
-    { x: 300, y: 540 },   // Down to (col 7, row 13)
-    { x: 60,  y: 540 },   // Left switchback across to (col 1, row 13)
-    { x: 60,  y: 700 },   // Down to (col 1, row 17)
-    { x: 300, y: 700 },   // Right switchback across to (col 7, row 17)
-    { x: 300, y: 860 },   // Down to (col 7, row 21)
-    { x: 180, y: 860 },   // Left to (col 4, row 21)
-    { x: 180, y: 1020 }   // Down to Castle Gate (col 4, row 25.5)
+    { x: 180, y: 0 },    // Top Enemy Spawn (col 4, top of row 0)
+    { x: 180, y: 60 },   // Down to (col 4, row 1)
+    { x: 300, y: 60 },   // Right to (col 7, row 1)
+    { x: 300, y: 140 },  // Down to (col 7, row 3)
+    { x: 60,  y: 140 },  // Left across to (col 1, row 3)
+    { x: 60,  y: 220 },  // Down to (col 1, row 5)
+    { x: 300, y: 220 },  // Right across to (col 7, row 5)
+    { x: 300, y: 300 },  // Down to (col 7, row 7)
+    { x: 60,  y: 300 },  // Left across to (col 1, row 7)
+    { x: 60,  y: 380 },  // Down to (col 1, row 9)
+    { x: 180, y: 380 },  // Right to (col 4, row 9)
+    { x: 180, y: 460 }   // Down to Castle Gate (col 4, row 11)
   ];
 
   // Pre-calculated segment lengths and total path length
@@ -978,7 +1021,7 @@
         return { x, y, angle };
       }
     }
-    return { x: 180, y: 1020, angle: Math.PI / 2 };
+    return { x: 180, y: 460, angle: Math.PI / 2 };
   }
 
   // Path detection for grid tiles
@@ -1005,33 +1048,18 @@
 
   // Decorative nature elements on select grass tiles (pine trees, rocks, bushes, flowers)
   const NATURE_DECORATIONS = [
-    { col: 1, row: 1, type: 'trees', count: 4 },
-    { col: 2, row: 1, type: 'trees', count: 4 },
-    { col: 5, row: 1, type: 'bushes' },
-    { col: 6, row: 1, type: 'trees', count: 4 },
-    { col: 2, row: 3, type: 'trees', count: 6 },
-    { col: 3, row: 3, type: 'trees', count: 6 },
-    { col: 4, row: 3, type: 'rocks', count: 3 },
-    { col: 1, row: 7, type: 'bushes' },
-    { col: 3, row: 7, type: 'trees', count: 6 },
-    { col: 4, row: 7, type: 'trees', count: 6 },
-    { col: 5, row: 7, type: 'flowers', count: 4 },
-    { col: 3, row: 11, type: 'rocks', count: 3 },
-    { col: 4, row: 11, type: 'trees', count: 6 },
-    { col: 5, row: 11, type: 'trees', count: 6 },
-    { col: 6, row: 11, type: 'bushes' },
-    { col: 1, row: 15, type: 'bushes' },
-    { col: 2, row: 15, type: 'trees', count: 6 },
-    { col: 3, row: 15, type: 'trees', count: 6 },
-    { col: 4, row: 15, type: 'flowers', count: 4 },
-    { col: 1, row: 19, type: 'bushes' },
-    { col: 3, row: 19, type: 'trees', count: 6 },
-    { col: 4, row: 19, type: 'trees', count: 6 },
-    { col: 5, row: 19, type: 'rocks', count: 3 },
-    { col: 1, row: 23, type: 'trees', count: 6 },
-    { col: 2, row: 23, type: 'trees', count: 6 },
-    { col: 5, row: 23, type: 'bushes' },
-    { col: 6, row: 23, type: 'rocks', count: 3 }
+    { col: 0, row: 0, type: 'trees', count: 4 },
+    { col: 8, row: 0, type: 'trees', count: 4 },
+    { col: 0, row: 2, type: 'bushes' },
+    { col: 8, row: 2, type: 'rocks', count: 3 },
+    { col: 0, row: 4, type: 'flowers', count: 4 },
+    { col: 8, row: 4, type: 'trees', count: 4 },
+    { col: 0, row: 6, type: 'trees', count: 4 },
+    { col: 8, row: 6, type: 'rocks', count: 3 },
+    { col: 0, row: 8, type: 'flowers', count: 4 },
+    { col: 8, row: 8, type: 'bushes' },
+    { col: 1, row: 10, type: 'bushes' },
+    { col: 7, row: 10, type: 'trees', count: 4 }
   ];
 
   // Tower Configurations
@@ -1275,7 +1303,7 @@
     resize() {
       if (!this.canvas) return;
       const rect = this.canvas.parentElement ? this.canvas.parentElement.getBoundingClientRect() : this.canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       this.canvas.width = rect.width * dpr;
       this.canvas.height = rect.height * dpr;
 
@@ -1785,20 +1813,17 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 3. Top Enemy Entrance Stone Arch
+      // 3. Top Enemy Entrance Stone Arch (visual portal entrance, no button)
       const ent = this.waypoints[1];
       ctx.save();
-      ctx.translate(ent.x, ent.y - 22);
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(-24, -8, 48, 16);
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(-24, -8, 48, 16);
-      ctx.fillStyle = '#fef08a';
-      ctx.font = 'bold 9px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('⚔️ SPAWN GATE', 0, 0);
+      ctx.translate(ent.x, ent.y - 20);
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
       ctx.restore();
 
       // 4. Defensive Towers beside the path
@@ -2318,8 +2343,9 @@
       this.perfectWavesCount = this.saveData.perfectWavesCount || 0;
       this.speedWavesCount = this.saveData.speedWavesCount || 0;
 
-      this.castleHealth = 100;
-      this.maxCastleHealth = 100;
+      const diffCfg = this.getDifficultyConfig();
+      this.castleHealth = diffCfg.startingCastleHealth;
+      this.maxCastleHealth = diffCfg.startingCastleHealth;
       this.castleHitTimer = 0;
       this.wave = 1;
       this.waveDuration = 0;
@@ -2499,9 +2525,15 @@
       if (!DIFFICULTY_CONFIG[diff]) return;
       this.difficulty = diff;
       this.settings.difficulty = diff;
-      localStorage.setItem('vtd_difficulty', diff);
+      Storage.setDifficulty(diff);
+      const diffCfg = this.getDifficultyConfig();
+      if (!this.isPlaying) {
+        this.castleHealth = diffCfg.startingCastleHealth;
+        this.maxCastleHealth = diffCfg.startingCastleHealth;
+      }
       this.saveAll();
       this.updateDifficultyUI();
+      this.updateHud();
     }
 
     setGraphicsQuality(quality) {
@@ -2758,9 +2790,10 @@
       document.getElementById('challenge-complete-modal')?.classList.add('hidden');
       document.getElementById('challenge-failed-modal')?.classList.add('hidden');
 
+      const diffCfg = this.getDifficultyConfig();
       this.isPlaying = true;
-      this.castleHealth = 100;
-      this.maxCastleHealth = 100;
+      this.castleHealth = diffCfg.startingCastleHealth;
+      this.maxCastleHealth = diffCfg.startingCastleHealth;
       this.castleHitTimer = 0;
       this.wave = 1;
       this.isPaused = false;
@@ -2791,7 +2824,7 @@
 
       this.updateHud();
       this.showScreen('gameplay-screen');
-      this.showWaveBanner('WAVE 1 / 100', 'PREPARE DEFENSES!');
+      this.showWaveBanner(`WAVE 1 / ${diffCfg.maxWaves}`, 'PREPARE DEFENSES!');
       this.sound.startMusic();
     }
 
@@ -2826,12 +2859,20 @@
       this.sound.victorySound();
 
       const diffCfg = this.getDifficultyConfig();
+      const maxW = diffCfg.maxWaves || 50;
+
+      const vTitle = document.querySelector('.victory-title') || document.getElementById('vic-title');
+      const vSub = document.querySelector('.victory-subtitle') || document.getElementById('vic-subtitle');
+      const vWaves = document.getElementById('vic-waves') || document.querySelector('.victory-stats .stat-line-val.highlight');
       const vDiff = document.getElementById('vic-difficulty');
       const vCastle = document.getElementById('vic-castle');
       const vMoney = document.getElementById('vic-money');
       const vKills = document.getElementById('vic-kills');
       const vDur = document.getElementById('vic-duration');
 
+      if (vTitle) vTitle.textContent = `${maxW} / ${maxW} WAVES COMPLETED!`;
+      if (vSub) vSub.textContent = `🏆 VICTORY - CITADEL DEFENDED ON ${diffCfg.name}!`;
+      if (vWaves) vWaves.textContent = `${maxW} / ${maxW}`;
       if (vDiff) vDiff.textContent = diffCfg.name;
       if (vCastle) vCastle.textContent = `🏰 ${this.castleHealth} / ${this.maxCastleHealth}`;
       if (vMoney) vMoney.textContent = `Rs ${this.matchMoneyCollected}`;
@@ -2852,6 +2893,8 @@
       const hw = document.getElementById('hud-wave');
       const pt = document.getElementById('prep-timer-val');
       const wb = document.getElementById('wave-control-bar');
+      const diffCfg = this.getDifficultyConfig();
+      const maxW = diffCfg.maxWaves || 50;
 
       if (hc) hc.textContent = `${this.castleHealth} / ${this.maxCastleHealth}`;
       if (hw) {
@@ -2863,7 +2906,7 @@
             hw.textContent = `WAVE ${this.wave}`;
           }
         } else {
-          hw.textContent = `WAVE ${this.wave} / 100`;
+          hw.textContent = `WAVE ${this.wave} / ${maxW}`;
         }
       }
       this.updateMoneyDisplay();
@@ -2898,30 +2941,37 @@
       this.updateHud();
 
       const diffCfg = this.getDifficultyConfig();
+      const maxW = diffCfg.maxWaves || 50;
       this.spawnInterval = diffCfg.spawnInterval;
 
       const isBossWave = (this.wave % 5 === 0);
-      const isFinalWave = (this.wave === 100);
+      const isFinalWave = (this.wave === maxW);
 
       this.sound.waveHorn();
       if (isFinalWave) {
-        this.showWaveBanner('WAVE 100 / 100', '🔥 FINAL BOSS: VOID BEHEMOTH SUPREME!');
+        this.showWaveBanner(`WAVE ${maxW} / ${maxW}`, '🔥 FINAL BOSS: VOID BEHEMOTH SUPREME!');
       } else if (isBossWave) {
-        this.showWaveBanner(`WAVE ${this.wave} / 100`, '⚠️ VOID BEHEMOTH BOSS!');
+        this.showWaveBanner(`WAVE ${this.wave} / ${maxW}`, '⚠️ VOID BEHEMOTH BOSS!');
       } else {
-        this.showWaveBanner(`WAVE ${this.wave} / 100`, 'MONSTERS MARCH!');
+        this.showWaveBanner(`WAVE ${this.wave} / ${maxW}`, 'MONSTERS MARCH!');
       }
 
       // Generate Enemy Queue for this wave
       this.spawnQueue = [];
       const currentWave = this.wave;
-      // ENEMY HEALTH RULE:
-      // Wave 1 -> 1, Wave 2 -> 2, Wave 3 -> 3, Wave 4 -> 4, Wave 5+ -> 4
-      // Increases by exactly +1 at the start of each new wave until 4. Maximum is 4. Never above 4.
-      const enemyHealth = Math.min(currentWave, 4);
 
-      const count = Math.min(45, 6 + Math.floor(currentWave * 0.4) + Math.floor(currentWave / 5) * 2);
-      const spdMultiplier = Math.min(1.35, 1 + (currentWave - 1) * 0.015) * diffCfg.enemySpeedMultiplier;
+      // Basic enemy baseline health based on difficulty:
+      // EASY: 3 HP, NORMAL: 4 HP, HARD: 5 HP
+      const baseHp = diffCfg.basicEnemyHp || 3;
+      const waveHpScale = Math.floor((currentWave - 1) / (diffCfg.id === 'easy' ? 18 : (diffCfg.id === 'normal' ? 14 : 10)));
+      const basicEnemyHealth = baseHp + waveHpScale;
+
+      const count = diffCfg.id === 'easy' 
+        ? Math.min(24, 4 + Math.floor(currentWave * 0.35))
+        : (diffCfg.id === 'normal'
+            ? Math.min(32, 5 + Math.floor(currentWave * 0.45))
+            : Math.min(45, 7 + Math.floor(currentWave * 0.55)));
+      const spdMultiplier = Math.min(1.22, 1 + (currentWave - 1) * 0.008) * diffCfg.enemySpeedMultiplier;
 
       for (let i = 0; i < count; i++) {
         let typeKey = 'basic';
@@ -2929,14 +2979,20 @@
         if (currentWave >= 3 && i % 5 === 2) typeKey = 'flying';
         if (currentWave >= 4 && i % 6 === 3) typeKey = 'heavy';
 
-        // Every 5th wave contains a Void Behemoth boss (or Void Behemoth Supreme on Wave 100)
+        // Every 5th wave contains a Void Behemoth boss (or Void Behemoth Supreme on Final Wave)
         if (isBossWave && i === count - 1) {
           typeKey = isFinalWave ? 'finalBoss' : 'boss';
         }
 
         const cfg = ENEMY_TYPES[typeKey];
-        const calcHp = enemyHealth;
-        const castleDmg = 1;
+        let calcHp = basicEnemyHealth;
+        if (typeKey === 'fast') calcHp = Math.max(2, basicEnemyHealth - 1);
+        else if (typeKey === 'flying') calcHp = basicEnemyHealth;
+        else if (typeKey === 'heavy') calcHp = Math.round(basicEnemyHealth * 2.2);
+        else if (typeKey === 'boss') calcHp = Math.round(basicEnemyHealth * 7 + currentWave * (diffCfg.id === 'hard' ? 2 : 1));
+        else if (typeKey === 'finalBoss') calcHp = Math.round(basicEnemyHealth * 20 + currentWave * (diffCfg.id === 'hard' ? 3 : 1.5));
+
+        const castleDmg = (diffCfg.id === 'hard' && typeKey === 'heavy') ? 2 : (typeKey === 'boss' ? 5 : (typeKey === 'finalBoss' ? 15 : 1));
 
         this.spawnQueue.push({
           type: typeKey,
@@ -2945,7 +3001,7 @@
           maxHp: calcHp,
           speed: cfg.speed * spdMultiplier,
           castleDamage: castleDmg,
-          reward: Math.round(cfg.reward * (1 + currentWave * 0.06)),
+          reward: Math.round(cfg.reward * (1 + currentWave * 0.05)),
           color: cfg.color,
           icon: cfg.icon,
           radius: cfg.radius,
@@ -2963,7 +3019,7 @@
       this.addMoney(waveReward);
 
       this.highestWave = Math.max(this.highestWave, this.wave);
-      if (this.castleHealth >= 100) {
+      if (this.castleHealth >= this.maxCastleHealth) {
         this.perfectWaveCount++;
         this.perfectWavesCount++;
       }
@@ -2979,20 +3035,23 @@
         if (!this.isPlaying) return;
       }
 
-      if (this.wave >= 100) {
-        // Successfully completed Wave 100: Show victory!
+      const diffCfg = this.getDifficultyConfig();
+      const maxW = diffCfg.maxWaves || 50;
+
+      if (this.wave >= maxW) {
+        // Successfully completed final wave for this difficulty!
         this.sound.victorySound();
-        this.showWaveBanner('🏆 100 WAVES COMPLETED!', 'CITADEL DEFENDED & VICTORY!');
+        this.showWaveBanner(`🏆 ${maxW} / ${maxW} WAVES COMPLETED!`, 'CITADEL DEFENDED & VICTORY!');
         setTimeout(() => {
           this.showVictoryScreen();
         }, 1600);
         return;
       }
 
-      this.showWaveBanner(`WAVE ${this.wave} / 100 CLEARED!`, `+Rs ${waveReward} BONUS`);
+      this.showWaveBanner(`WAVE ${this.wave} / ${maxW} CLEARED!`, `+Rs ${waveReward} BONUS`);
       this.wave++;
       this.waveDuration = 0;
-      this.prepTimer = 10;
+      this.prepTimer = 8;
       this.updateHud();
     }
 
@@ -3002,7 +3061,7 @@
       if (this.canvas) {
         const width = (wrapper && wrapper.clientWidth) ? wrapper.clientWidth : 360;
         const height = (wrapper && wrapper.clientHeight) ? wrapper.clientHeight : 640;
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
         this.canvas.width = width * dpr;
         this.canvas.height = height * dpr;
@@ -3212,6 +3271,35 @@
         t.cooldown -= dt;
         if (t.cooldown <= 0) {
           this.towerAttack(t);
+        }
+      }
+
+      // Citadel Wall Archer Defense: Wall archers fire defensive arrows at incoming enemies near castle
+      this.castleShootTimer = (this.castleShootTimer || 1.0) - dt;
+      if (this.castleShootTimer <= 0) {
+        this.castleShootTimer = 1.1;
+        let nearestEnemy = null;
+        let highestDist = -1;
+        for (let e of this.enemies) {
+          if (e.y >= 320 && e.distance > highestDist) {
+            highestDist = e.distance;
+            nearestEnemy = e;
+          }
+        }
+        if (nearestEnemy) {
+          this.sound.arrowShoot();
+          this.projectiles.push({
+            x: 180,
+            y: 450,
+            targetEnemy: nearestEnemy,
+            targetX: nearestEnemy.x,
+            targetY: nearestEnemy.y,
+            speed: 460,
+            damage: 2,
+            type: 'archer',
+            life: 1.5,
+            color: '#fbbf24'
+          });
         }
       }
 
@@ -3497,7 +3585,7 @@
     // --- FREE TOWER PLACEMENT & GRID INTERACTION ---
     isTileValidForPlacement(col, row) {
       if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return false;
-      if (row >= 25) return false; // Castle ramparts & fortress
+      if (row >= 11) return false; // Castle ramparts & fortress
       if (row === 0 && col === 4) return false; // Enemy spawn portal
       if (isTileOnPath(col, row)) return false; // Enemy path
       if (this.towers.some(t => t.col === col && t.row === row)) return false; // Already occupied
@@ -3561,11 +3649,11 @@
       }
 
       // 2. Check if clicked castle or spawn
-      if (row >= 25 || (row === 0 && col === 4)) {
+      if (row >= 11 || (row === 0 && col === 4)) {
         this.closeInspector();
         this.clearTileSelection();
         this.sound.buttonClick();
-        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, 'CASTLE AREA!', '#ef4444');
+        this.addFloatingText(col * TILE_SIZE + 20, row * TILE_SIZE + 20, row >= 11 ? 'CASTLE FORTRESS' : 'SPAWN ENTRANCE', '#ef4444');
         return;
       }
 
@@ -3778,7 +3866,7 @@
           const tileX = c * TILE_SIZE;
           const tileY = r * TILE_SIZE;
 
-          if (r >= 26) {
+          if (r >= 11) {
             // Castle Stone Courtyard
             ctx.fillStyle = (c + r) % 2 === 0 ? '#1e293b' : '#172033';
             ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -3930,18 +4018,14 @@
       ctx.arc(0, 0, 12, portalAura, portalAura + Math.PI);
       ctx.stroke();
 
-      ctx.font = '14px sans-serif';
+      ctx.font = '16px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🚪', 0, 0);
-
-      ctx.font = 'bold 9px sans-serif';
-      ctx.fillStyle = '#fca5a5';
-      ctx.fillText('SPAWN', 0, 24);
       ctx.restore();
 
-      // 4. Fantasy Castle at Bottom (rows 25 to 27)
-      const castleGateY = 25 * TILE_SIZE + 20; // 1020px
+      // 4. Fantasy Castle at Bottom (rows 11 to 12)
+      const castleGateY = 11 * TILE_SIZE + 20; // 460px
       ctx.save();
       ctx.translate(180, castleGateY);
 
@@ -3955,7 +4039,7 @@
         ctx.stroke();
       }
 
-      // Stone Wall with Crenellations across row 26
+      // Stone Wall with Crenellations across row 11
       ctx.fillStyle = this.castleHitTimer > 0 ? '#450a0a' : '#1e293b';
       ctx.fillRect(-180, 20, 360, 50);
       ctx.strokeStyle = this.castleHitTimer > 0 ? '#ef4444' : '#f59e0b';
@@ -4032,7 +4116,7 @@
       ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#fbbf24';
-      ctx.fillText(`🏰 CASTLE DEFENSE (${this.castleHealth} HP)`, 0, -28);
+      ctx.fillText(`🏰 CITADEL (${this.castleHealth} / ${this.maxCastleHealth} HP)`, 0, -28);
       ctx.restore();
 
       // 5. Grid Hover & Selection Highlights
@@ -4079,7 +4163,7 @@
             ctx.fillText(this.selectedBuildType ? cfg.icon : '➕', hx + 20, hy + 20);
             ctx.restore();
           }
-        } else if (isTileOnPath(hc, hr) || hr >= 25 || (hr === 0 && hc === 4)) {
+        } else if (isTileOnPath(hc, hr) || hr >= 11 || (hr === 0 && hc === 4)) {
           // Path or Castle tile: red preview indicating no placement allowed
           ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
           ctx.fillRect(hx, hy, TILE_SIZE, TILE_SIZE);

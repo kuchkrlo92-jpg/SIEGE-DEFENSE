@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.ConsoleMessage
 import android.webkit.RenderProcessGoneDetail
@@ -38,6 +39,7 @@ import com.example.ui.theme.MyApplicationTheme
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     enableEdgeToEdge()
     setContent {
       MyApplicationTheme(darkTheme = true, dynamicColor = false) {
@@ -87,6 +89,7 @@ fun TowerDefenseGameView(modifier: Modifier = Modifier) {
             ViewGroup.LayoutParams.MATCH_PARENT
           )
           setBackgroundColor(Color.parseColor("#030712"))
+          setLayerType(View.LAYER_TYPE_SOFTWARE, null)
           isFocusable = true
           isFocusableInTouchMode = true
 

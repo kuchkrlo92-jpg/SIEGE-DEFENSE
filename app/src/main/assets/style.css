@@ -411,36 +411,6 @@ body {
   display: block;
 }
 
-.map-scroll-controls {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 25;
-}
-
-.btn-scroll-nav {
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid var(--border-gold);
-  color: #fef08a;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 5px 9px;
-  border-radius: 8px;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  backdrop-filter: blur(4px);
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-}
-
-.btn-scroll-nav:hover, .btn-scroll-nav:active {
-  background: rgba(245, 158, 11, 0.3);
-  transform: scale(0.96);
-}
-
 .tile-selection-hint {
   position: absolute;
   bottom: 8px;
